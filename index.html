@@ -54,13 +54,16 @@
   };
 </script>
 
-  <meta property="og:type" content="website">
+  <meta name="description" content="个人博客">
+<meta property="og:type" content="website">
 <meta property="og:title" content="博客">
 <meta property="og:url" content="https://zhouhongfa.github.io/index.html">
 <meta property="og:site_name" content="博客">
+<meta property="og:description" content="个人博客">
 <meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="博客">
+<meta name="twitter:description" content="个人博客">
   <link rel="canonical" href="https://zhouhongfa.github.io/">
 
 
@@ -250,7 +253,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zhouhongfa">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content="个人博客">
       <meta itemprop="image" content="/images/avatar.jpg">
     </span>
 
@@ -275,7 +278,7 @@
                 
               
 
-              <time title="创建时间：2019-08-24 17:28:34 / 修改时间：17:34:38" itemprop="dateCreated datePublished" datetime="2019-08-24T17:28:34+08:00">2019-08-24</time>
+              <time title="创建时间：2019-08-24 17:28:34 / 修改时间：17:45:46" itemprop="dateCreated datePublished" datetime="2019-08-24T17:28:34+08:00">2019-08-24</time>
             </span>
           
             
@@ -295,10 +298,27 @@
 
       
           <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>记录一下搭建 hexo 博客中的一些笔记</p>
+<h2 id="Hexo-安装"><a href="#Hexo-安装" class="headerlink" title="Hexo 安装"></a>Hexo 安装</h2><p>网上的教程很详细了，这里简单记一下</p>
+<p>在 <code>D:\Files</code> 打开 <code>git bash</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br><span class="line">hexo init hexo-blog</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">zhf@DESKTOP-2EL8QVU MINGW64 /d/Files</span><br><span class="line">$ cd hexo-blog/</span><br><span class="line"></span><br><span class="line">zhf@DESKTOP-2EL8QVU MINGW64 /d/Files/hexo-blog</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
+
+<p><code>hexo s</code> 启动</p>
+<p>配置 git </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br><span class="line">git remote add origin https://github.com/zhouhongfa/hexo-blog.git</span><br><span class="line"></span><br><span class="line">git config user.email &apos;zhouhongfa1996@gmail.com&apos;</span><br><span class="line">git pull origin master</span><br><span class="line">git add .</span><br><span class="line">git commit -m &apos;init&apos;</span><br><span class="line">git push --set-upstream origin master</span><br></pre></td></tr></table></figure>
+
 <h2 id="next-主题配置"><a href="#next-主题配置" class="headerlink" title="next 主题配置"></a>next 主题配置</h2><p>先 <code>fork</code> <a href="https://github.com/theme-next/hexo-theme-next" target="_blank" rel="noopener">next主题github仓库</a> ，(这样就能保存你的配置了，需要进入 <code>next</code> 目录来推，如果有更新，则用 pull request拉更新的内容，可参考 <a href="https://blog.csdn.net/qq1332479771/article/details/56087333" target="_blank" rel="noopener">github上fork了别人的项目后，再同步更新别人的提交</a>)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd hexo-blog</span><br><span class="line">git clone https://github.com/zhouhongfa/hexo-theme-next.git themes/next</span><br></pre></td></tr></table></figure>
 
 <p><a href="https://github.com/iissnan/hexo-theme-next/wiki" target="_blank" rel="noopener">主题wiki</a></p>
+<h2 id="github-Pages部署"><a href="#github-Pages部署" class="headerlink" title="github Pages部署"></a>github Pages部署</h2><p>到 github  创建一个 <code>zhouhongfa.github.io</code> 公开项目</p>
+<p><code>_config.yml</code> 配置如下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repo:</span> <span class="attr">https://github.com/zhouhongfa/zhouhongfa.github.io.git</span></span><br></pre></td></tr></table></figure>
+
+<p>同步到 github 上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
+
 <h2 id="头像、侧边栏等配置"><a href="#头像、侧边栏等配置" class="headerlink" title="头像、侧边栏等配置"></a>头像、侧边栏等配置</h2><p>参考 <a href="https://github.com/iissnan/hexo-theme-next/wiki" target="_blank" rel="noopener">wiki</a></p>
           <!--noindex-->
           
@@ -338,7 +358,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zhouhongfa">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content="个人博客">
       <meta itemprop="image" content="/images/avatar.jpg">
     </span>
 
@@ -467,7 +487,7 @@
       src="/images/avatar.jpg"
       alt="zhouhongfa">
   <p class="site-author-name" itemprop="name">zhouhongfa</p>
-  <div class="site-description motion-element" itemprop="description"></div>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
 </div>
   <nav class="site-state motion-element">
       <div class="site-state-item site-state-posts">
