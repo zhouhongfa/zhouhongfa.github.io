@@ -45,17 +45,7 @@ NexT.boot.registerEvents = function() {
     item.addClass(activeTabClassName);
   });
 
-  /**
-   * Init Sidebar & TOC inner dimensions on all pages and for all schemes.
-   * Need for Sidebar/TOC inner scrolling if content taller then viewport.
-   */
-  function initSidebarDimension() {
-    // Initialize Sidebar & TOC Height.
-    var sidebarWrapperHeight = document.body.clientHeight - NexT.utils.getSidebarSchemePadding();
-    $('.site-overview-wrap, .post-toc-wrap').css('max-height', sidebarWrapperHeight);
-  }
-  initSidebarDimension();
-  window.addEventListener('resize', initSidebarDimension);
+  window.addEventListener('resize', NexT.utils.initSidebarDimension);
 
   window.addEventListener('hashchange', () => {
     var tHash = location.hash;
@@ -73,7 +63,7 @@ NexT.boot.refresh = function() {
    * Need to add config option in Front-End at 'layout/_partials/head.swig' file.
    */
   CONFIG.fancybox && NexT.utils.wrapImageWithFancyBox();
-  CONFIG.mediumzoom && window.mediumZoom('.post-body img');
+  CONFIG.mediumzoom && window.mediumZoom('.post-body :not(a) > img');
   CONFIG.lazyload && window.lozad('.post-body img').observe();
   CONFIG.pangu && window.pangu.spacingPage();
 
@@ -81,18 +71,7 @@ NexT.boot.refresh = function() {
   CONFIG.copycode.enable && NexT.utils.registerCopyCode();
   NexT.utils.registerTabsTag();
   NexT.utils.registerActiveMenuItem();
-  NexT.utils.embeddedVideoTransformer();
-
-  var sidebarNav = document.querySelector('.sidebar-nav');
-  if (document.querySelector('.post-toc-wrap').childElementCount > 0) {
-    sidebarNav.style.display = '';
-    sidebarNav.classList.add('motion-element');
-    document.querySelector('.sidebar-nav-toc').click();
-  } else {
-    sidebarNav.style.display = 'none';
-    sidebarNav.classList.remove('motion-element');
-    document.querySelector('.sidebar-nav-overview').click();
-  }
+  NexT.utils.registerSidebarTOC();
 
   $('table').not('.gist table').wrap('<div class="table-container"></div>');
 };
