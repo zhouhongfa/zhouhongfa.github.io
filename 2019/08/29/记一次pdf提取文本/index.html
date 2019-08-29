@@ -28,7 +28,7 @@
     scheme: 'Muse',
     version: '7.3.0',
     exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":null},
     back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
@@ -54,19 +54,21 @@
   };
 </script>
 
-  <meta name="description" content="hexo 搭建 https://zhouhongfa.github.io">
-<meta name="keywords" content="test">
+  <meta name="description" content="说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……">
+<meta name="keywords" content="正则表达式,ocr,pdf转换,regex,cda">
 <meta property="og:type" content="article">
-<meta property="og:title" content="我的博客">
-<meta property="og:url" content="https://zhouhongfa.github.io/2019/08/26/introduce/index.html">
+<meta property="og:title" content="记一次pdf提取文本">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/index.html">
 <meta property="og:site_name" content="博客">
-<meta property="og:description" content="hexo 搭建 https://zhouhongfa.github.io">
+<meta property="og:description" content="说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-26T01:13:15.809Z">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/1567043212236.png">
+<meta property="og:updated_time" content="2019-08-29T01:57:26.144Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="我的博客">
-<meta name="twitter:description" content="hexo 搭建 https://zhouhongfa.github.io">
-  <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/26/introduce/">
+<meta name="twitter:title" content="记一次pdf提取文本">
+<meta name="twitter:description" content="说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……">
+<meta name="twitter:image" content="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/1567043212236.png">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/">
 
 
 <script id="page-configurations">
@@ -80,7 +82,7 @@
   };
 </script>
 
-  <title>我的博客 | 博客</title>
+  <title>记一次pdf提取文本 | 博客</title>
   <meta name="generator" content="Hexo 3.9.0">
   
 
@@ -253,7 +255,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/08/26/introduce/">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zhouhongfa">
@@ -265,7 +267,7 @@
       <meta itemprop="name" content="博客">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">我的博客
+        <h1 class="post-title" itemprop="name headline">记一次pdf提取文本
 
           
         </h1>
@@ -281,21 +283,12 @@
                 
               
 
-              <time title="创建时间：2019-08-26 09:13:15" itemprop="dateCreated datePublished" datetime="2019-08-26T09:13:15+08:00">2019-08-26</time>
+              <time title="创建时间：2019-08-29 09:37:47 / 修改时间：09:57:26" itemprop="dateCreated datePublished" datetime="2019-08-29T09:37:47+08:00">2019-08-29</time>
             </span>
           
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a></span>
+            
 
-                
-                
-              
-            </span>
+            
           
 
           
@@ -309,8 +302,160 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p><code>hexo</code> 搭建</p>
-<p><a href="https://zhouhongfa.github.io">https://zhouhongfa.github.io</a></p>
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>需要从 十几个pdf文件中提取 <code>xml</code>，本来想用 <a href="https://pdfbox.apache.org/" target="_blank" rel="noopener">pdfbox</a> 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……</p>
+<a id="more"></a>
+
+<p><strong>思路</strong></p>
+<p>首页将需要提取的文件截图（可以写个脚本来做？有空看看）使用 <code>ocr</code> 来转换，我用的是 <a href="https://ai.qq.com/product/ocr.shtml#common" target="_blank" rel="noopener">腾讯AI上的</a>，然后写个程序去调 <code>ocr</code> 接口，将获取的结果写入<code>xml</code>中，然后再用 <strong>正则替换</strong> 来修正其中的一些格式问题。</p>
+<h2 id="优图OCR服务"><a href="#优图OCR服务" class="headerlink" title="优图OCR服务"></a>优图OCR服务</h2><p>注意在 <code>腾讯AI开放平台</code>注册，然后创建应用，需要接入 <code>通用OCR</code> 能力，才能调api，不然会报 <code>no auth</code> 错误</p>
+<img src="/2019/08/29/记一次pdf提取文本/1567043212236.png" title="接入能力">
+
+<p>点击 <code>接入能力</code> 选择你的应用即可</p>
+<h2 id="批量调用接口并生成xml"><a href="#批量调用接口并生成xml" class="headerlink" title="批量调用接口并生成xml"></a>批量调用接口并生成xml</h2><p><a href="https://github.com/zhouhongfa/ocr-demo" target="_blank" rel="noopener">项目github</a></p>
+<h2 id="正则替换记录"><a href="#正则替换记录" class="headerlink" title="正则替换记录"></a>正则替换记录</h2><table>
+<thead>
+<tr>
+<th align="left">正则</th>
+<th>替换文本</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">`^(</td>
+<td>〈</td>
+<td>&lt;\s+`</td>
+</tr>
+<tr>
+<td align="left"><code>(&lt;[a-zA-Z]+)\)</code></td>
+<td><code>$1&gt;</code></td>
+<td><code>&lt;houseNumber)</code> 改成 <code>&lt;houseNumber&gt;</code></td>
+</tr>
+<tr>
+<td align="left">`〉</td>
+<td>)$`</td>
+<td><code>&gt;</code></td>
+</tr>
+<tr>
+<td align="left">`\b’</td>
+<td>‘\s?</td>
+<td>‘</td>
+</tr>
+<tr>
+<td align="left"><code>(=)\s(&quot;)\s</code></td>
+<td><code>$1$2</code></td>
+<td><code>Code = &quot; IN</code> 改成 <code>Code = &quot;IN</code></td>
+</tr>
+<tr>
+<td align="left"><code>\s?(=)\s?</code></td>
+<td><code>$1</code></td>
+<td>去掉 <code>=</code> 两边的空格</td>
+</tr>
+<tr>
+<td align="left">`xsi:\s</td>
+<td>xsi\s:`</td>
+<td><code>xsi:</code></td>
+</tr>
+<tr>
+<td align="left">`&lt;/\s</td>
+<td>&lt;\s/`</td>
+<td><code>&lt;/</code></td>
+</tr>
+<tr>
+<td align="left">`\s/&gt;</td>
+<td>/\s&gt;`</td>
+<td><code>/&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>^&lt;!\s-+</code></td>
+<td><code>&lt;!--</code></td>
+<td>修正 <code>&lt;!--</code></td>
+</tr>
+<tr>
+<td align="left"><code>(&lt;!-)(?!-)</code></td>
+<td><code>$1-</code></td>
+<td><code>&lt;!-</code> 改成 <code>&lt;!--</code></td>
+</tr>
+<tr>
+<td align="left"><code>(?&lt;!-)(-&gt;)$</code></td>
+<td><code>-$1</code></td>
+<td><code>-&gt;</code> 改成 <code>--&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>(\d)\s(\.)</code></td>
+<td><code>$1$2</code></td>
+<td><code>2.16 .8</code>改成 <code>2.16.8</code></td>
+</tr>
+<tr>
+<td align="left"><code>(\d\.)\s</code></td>
+<td><code>$1</code></td>
+<td><code>2.16. 1</code> 改成 <code>2.16.1</code></td>
+</tr>
+<tr>
+<td align="left"><code>\s(&quot;)</code></td>
+<td><code>$1</code></td>
+<td><code>code=&quot;30954-2 &quot;</code> 改成 <code>code=&quot;30954-2&quot;</code></td>
+</tr>
+<tr>
+<td align="left"><code>(=&quot;)\s</code></td>
+<td><code>$1</code></td>
+<td><code>typeCode=&quot; RCT&quot;</code> 改成 <code>typeCode=&quot;RCT&quot;</code></td>
+</tr>
+<tr>
+<td align="left"><code>(&lt;[a-zA-z]+)\)</code></td>
+<td><code>$1&gt;</code></td>
+<td><code>&lt;addr)</code> 改成 <code>&lt;addr&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>(?&lt;=&quot;)(?=[a-zA-Z]+=)</code></td>
+<td>空格</td>
+<td><code>&quot;2&quot;unit=</code> 改成 <code>&quot;2&quot; unit=</code></td>
+</tr>
+<tr>
+<td align="left"><code>(=&quot;)\s</code></td>
+<td><code>$1</code></td>
+<td><code>root=&quot; 2</code> 改成 <code>root=&quot;2</code></td>
+</tr>
+<tr>
+<td align="left"><code>(?&lt;=&lt;/)([a-zA-Z]+)\s</code></td>
+<td><code>$1</code></td>
+<td><code>&lt;/entryRelat ionship&gt;</code>改成 <code>&lt;/entryRelationship&gt;</code> 应多次执行</td>
+</tr>
+<tr>
+<td align="left"><code>(?&lt;=&lt;/?)([a-zA-Z]+$)</code></td>
+<td><code>$1&gt;</code></td>
+<td><code>&lt;/observation</code> 改成 <code>&lt;/observation&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>(&lt;[a-zA-Z]+) (?!xsi:type)(?!/&gt;)(?![a-zA-Z:]+=)</code></td>
+<td><code>$1</code></td>
+<td><code>&lt;entryRelat ionship</code> 改成 <code>&lt;entryRelationship</code> 需要多次调用以防 出现  <code>&lt;entry Relat ionship</code>这种情况</td>
+</tr>
+<tr>
+<td align="left"><code>(&lt;[a-zA-Z]+)\.\s*</code></td>
+<td><code>$1</code></td>
+<td><code>&lt;ass. igned</code> 改成 <code>&lt;assigned</code></td>
+</tr>
+<tr>
+<td align="left"><code>(\s[a-zA-Z]+)\s([a-zA-Z]+=)</code></td>
+<td><code>$1$2</code></td>
+<td><code>extens ion=&quot;PO</code>改成 <code>extension=&quot;PO</code></td>
+</tr>
+<tr>
+<td align="left"><code>(\.)\n</code></td>
+<td><code>$1</code></td>
+<td>将以 <code>.</code> 结尾的换行符去掉</td>
+</tr>
+<tr>
+<td align="left"><code>\n^(=)</code></td>
+<td><code>$1</code></td>
+<td>将以 <code>=</code>开头的前一个换行符去掉</td>
+</tr>
+<tr>
+<td align="left"><code>&quot;$\n</code></td>
+<td><code>&quot;空格</code></td>
+<td>将以<code>&quot;</code> 结尾的换行符替换来空格</td>
+</tr>
+</tbody></table>
 
     </div>
 
@@ -326,7 +471,15 @@
           
           <div class="post-tags">
             
-              <a href="/tags/test/" rel="tag"># test</a>
+              <a href="/tags/正则表达式/" rel="tag"># 正则表达式</a>
+            
+              <a href="/tags/ocr/" rel="tag"># ocr</a>
+            
+              <a href="/tags/pdf转换/" rel="tag"># pdf转换</a>
+            
+              <a href="/tags/regex/" rel="tag"># regex</a>
+            
+              <a href="/tags/cda/" rel="tag"># cda</a>
             
           </div>
         
@@ -396,6 +549,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优图OCR服务"><span class="nav-number">2.</span> <span class="nav-text">优图OCR服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#批量调用接口并生成xml"><span class="nav-number">3.</span> <span class="nav-text">批量调用接口并生成xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则替换记录"><span class="nav-number">4.</span> <span class="nav-text">正则替换记录</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
@@ -413,7 +568,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -463,7 +618,17 @@
         
           
         
-        <span class="site-state-item-count">8</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -594,7 +759,7 @@
       repo: 'hexo-comment-repo',
       owner: 'zhouhongfa',
       admin: ['zhouhongfa'],
-      id: '937899f172b82d1a5b5640dd107b68f2',
+      id: 'a215e17aeb2020e94984dd95f943bce0',
         language: window.navigator.language || window.navigator.userLanguage,
       
       distractionFreeMode: 'true'
