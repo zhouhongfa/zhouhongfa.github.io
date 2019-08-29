@@ -28,7 +28,7 @@
     scheme: 'Muse',
     version: '7.3.0',
     exturl: false,
-    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    sidebar: {"position":"right","display":"hide","offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":null},
     back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
@@ -63,7 +63,7 @@
 <meta property="og:description" content="说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://zhouhongfa.github.io/2019/08/29/记一次pdf提取文本/1567043212236.png">
-<meta property="og:updated_time" content="2019-08-29T01:57:26.144Z">
+<meta property="og:updated_time" content="2019-08-29T02:22:39.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次pdf提取文本">
 <meta name="twitter:description" content="说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路……">
@@ -283,7 +283,7 @@
                 
               
 
-              <time title="创建时间：2019-08-29 09:37:47 / 修改时间：09:57:26" itemprop="dateCreated datePublished" datetime="2019-08-29T09:37:47+08:00">2019-08-29</time>
+              <time title="创建时间：2019-08-29 09:37:47 / 修改时间：10:22:39" itemprop="dateCreated datePublished" datetime="2019-08-29T09:37:47+08:00">2019-08-29</time>
             </span>
           
             
@@ -312,146 +312,147 @@
 
 <p>点击 <code>接入能力</code> 选择你的应用即可</p>
 <h2 id="批量调用接口并生成xml"><a href="#批量调用接口并生成xml" class="headerlink" title="批量调用接口并生成xml"></a>批量调用接口并生成xml</h2><p><a href="https://github.com/zhouhongfa/ocr-demo" target="_blank" rel="noopener">项目github</a></p>
-<h2 id="正则替换记录"><a href="#正则替换记录" class="headerlink" title="正则替换记录"></a>正则替换记录</h2><table>
+<h2 id="正则替换记录"><a href="#正则替换记录" class="headerlink" title="正则替换记录"></a>正则替换记录</h2><p>我用的 <code>vscode</code> 软件来替换的</p>
+<table>
 <thead>
 <tr>
-<th align="left">正则</th>
+<th>正则</th>
 <th>替换文本</th>
 <th>说明</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="left">`^(</td>
-<td>〈</td>
-<td>&lt;\s+`</td>
+<td>^\(|〈|&lt;\s+</td>
+<td>&lt;</td>
+<td>&lt; 去空格    ( 改为 &lt;</td>
 </tr>
 <tr>
-<td align="left"><code>(&lt;[a-zA-Z]+)\)</code></td>
-<td><code>$1&gt;</code></td>
-<td><code>&lt;houseNumber)</code> 改成 <code>&lt;houseNumber&gt;</code></td>
+<td>(&lt;[a-zA-Z]+)\)</td>
+<td>$1&gt;</td>
+<td>&lt;houseNumber)  改成  <code>&lt;houseNumber&gt;</code></td>
 </tr>
 <tr>
-<td align="left">`〉</td>
-<td>)$`</td>
-<td><code>&gt;</code></td>
+<td>〉|\)$</td>
+<td>&gt;</td>
+<td>修正 &gt;</td>
 </tr>
 <tr>
-<td align="left">`\b’</td>
-<td>‘\s?</td>
-<td>‘</td>
+<td>\b’|’\s?|‘|”|’</td>
+<td>“</td>
+<td><code>&quot;</code>修正</td>
 </tr>
 <tr>
-<td align="left"><code>(=)\s(&quot;)\s</code></td>
+<td><code>(=)\s(&quot;)\s</code></td>
 <td><code>$1$2</code></td>
 <td><code>Code = &quot; IN</code> 改成 <code>Code = &quot;IN</code></td>
 </tr>
 <tr>
-<td align="left"><code>\s?(=)\s?</code></td>
+<td><code>\s?(=)\s?</code></td>
 <td><code>$1</code></td>
 <td>去掉 <code>=</code> 两边的空格</td>
 </tr>
 <tr>
-<td align="left">`xsi:\s</td>
-<td>xsi\s:`</td>
+<td>xsi:\s|xsi\s:</td>
 <td><code>xsi:</code></td>
+<td><code>xsi:type</code> 修正 执行两次~</td>
 </tr>
 <tr>
-<td align="left">`&lt;/\s</td>
-<td>&lt;\s/`</td>
+<td>&lt;/\s|&lt;\s/</td>
 <td><code>&lt;/</code></td>
+<td>修正 <code>&lt;/</code> 去掉多余的空格</td>
 </tr>
 <tr>
-<td align="left">`\s/&gt;</td>
-<td>/\s&gt;`</td>
+<td>\s/&gt;|/\s&gt;</td>
 <td><code>/&gt;</code></td>
+<td>修正 <code>/&gt;</code> 去掉多余的空格</td>
 </tr>
 <tr>
-<td align="left"><code>^&lt;!\s-+</code></td>
+<td><code>^&lt;!\s-+</code></td>
 <td><code>&lt;!--</code></td>
 <td>修正 <code>&lt;!--</code></td>
 </tr>
 <tr>
-<td align="left"><code>(&lt;!-)(?!-)</code></td>
+<td><code>(&lt;!-)(?!-)</code></td>
 <td><code>$1-</code></td>
 <td><code>&lt;!-</code> 改成 <code>&lt;!--</code></td>
 </tr>
 <tr>
-<td align="left"><code>(?&lt;!-)(-&gt;)$</code></td>
+<td><code>(?&lt;!-)(-&gt;)$</code></td>
 <td><code>-$1</code></td>
 <td><code>-&gt;</code> 改成 <code>--&gt;</code></td>
 </tr>
 <tr>
-<td align="left"><code>(\d)\s(\.)</code></td>
+<td><code>(\d)\s(\.)</code></td>
 <td><code>$1$2</code></td>
 <td><code>2.16 .8</code>改成 <code>2.16.8</code></td>
 </tr>
 <tr>
-<td align="left"><code>(\d\.)\s</code></td>
+<td><code>(\d\.)\s</code></td>
 <td><code>$1</code></td>
 <td><code>2.16. 1</code> 改成 <code>2.16.1</code></td>
 </tr>
 <tr>
-<td align="left"><code>\s(&quot;)</code></td>
+<td><code>\s(&quot;)</code></td>
 <td><code>$1</code></td>
 <td><code>code=&quot;30954-2 &quot;</code> 改成 <code>code=&quot;30954-2&quot;</code></td>
 </tr>
 <tr>
-<td align="left"><code>(=&quot;)\s</code></td>
+<td><code>(=&quot;)\s</code></td>
 <td><code>$1</code></td>
 <td><code>typeCode=&quot; RCT&quot;</code> 改成 <code>typeCode=&quot;RCT&quot;</code></td>
 </tr>
 <tr>
-<td align="left"><code>(&lt;[a-zA-z]+)\)</code></td>
+<td><code>(&lt;[a-zA-z]+)\)</code></td>
 <td><code>$1&gt;</code></td>
 <td><code>&lt;addr)</code> 改成 <code>&lt;addr&gt;</code></td>
 </tr>
 <tr>
-<td align="left"><code>(?&lt;=&quot;)(?=[a-zA-Z]+=)</code></td>
+<td><code>(?&lt;=&quot;)(?=[a-zA-Z]+=)</code></td>
 <td>空格</td>
 <td><code>&quot;2&quot;unit=</code> 改成 <code>&quot;2&quot; unit=</code></td>
 </tr>
 <tr>
-<td align="left"><code>(=&quot;)\s</code></td>
+<td><code>(=&quot;)\s</code></td>
 <td><code>$1</code></td>
 <td><code>root=&quot; 2</code> 改成 <code>root=&quot;2</code></td>
 </tr>
 <tr>
-<td align="left"><code>(?&lt;=&lt;/)([a-zA-Z]+)\s</code></td>
+<td><code>(?&lt;=&lt;/)([a-zA-Z]+)\s</code></td>
 <td><code>$1</code></td>
 <td><code>&lt;/entryRelat ionship&gt;</code>改成 <code>&lt;/entryRelationship&gt;</code> 应多次执行</td>
 </tr>
 <tr>
-<td align="left"><code>(?&lt;=&lt;/?)([a-zA-Z]+$)</code></td>
+<td><code>(?&lt;=&lt;/?)([a-zA-Z]+$)</code></td>
 <td><code>$1&gt;</code></td>
 <td><code>&lt;/observation</code> 改成 <code>&lt;/observation&gt;</code></td>
 </tr>
 <tr>
-<td align="left"><code>(&lt;[a-zA-Z]+) (?!xsi:type)(?!/&gt;)(?![a-zA-Z:]+=)</code></td>
+<td><code>(&lt;[a-zA-Z]+) (?!xsi:type)(?!/&gt;)(?![a-zA-Z:]+=)</code></td>
 <td><code>$1</code></td>
 <td><code>&lt;entryRelat ionship</code> 改成 <code>&lt;entryRelationship</code> 需要多次调用以防 出现  <code>&lt;entry Relat ionship</code>这种情况</td>
 </tr>
 <tr>
-<td align="left"><code>(&lt;[a-zA-Z]+)\.\s*</code></td>
+<td><code>(&lt;[a-zA-Z]+)\.\s*</code></td>
 <td><code>$1</code></td>
 <td><code>&lt;ass. igned</code> 改成 <code>&lt;assigned</code></td>
 </tr>
 <tr>
-<td align="left"><code>(\s[a-zA-Z]+)\s([a-zA-Z]+=)</code></td>
+<td><code>(\s[a-zA-Z]+)\s([a-zA-Z]+=)</code></td>
 <td><code>$1$2</code></td>
 <td><code>extens ion=&quot;PO</code>改成 <code>extension=&quot;PO</code></td>
 </tr>
 <tr>
-<td align="left"><code>(\.)\n</code></td>
+<td><code>(\.)\n</code></td>
 <td><code>$1</code></td>
 <td>将以 <code>.</code> 结尾的换行符去掉</td>
 </tr>
 <tr>
-<td align="left"><code>\n^(=)</code></td>
+<td><code>\n^(=)</code></td>
 <td><code>$1</code></td>
 <td>将以 <code>=</code>开头的前一个换行符去掉</td>
 </tr>
 <tr>
-<td align="left"><code>&quot;$\n</code></td>
+<td><code>&quot;$\n</code></td>
 <td><code>&quot;空格</code></td>
 <td>将以<code>&quot;</code> 结尾的换行符替换来空格</td>
 </tr>
