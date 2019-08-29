@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[在windows上安装hadoop2.6.4]]></title>
+    <url>%2F2019%2F08%2F29%2F%E5%9C%A8windows%E4%B8%8A%E5%AE%89%E8%A3%85hadoop%2F</url>
+    <content type="text"><![CDATA[版本 组件 版本 hadoop 2.6.4 jdk 1.8 下载地址hadoop winutils github JDK安装略 hadoop安装配置下载，解压到 D:\BIGDATA下 配置环境变量 变量名 值 HADOOP_HOME D:\BIGDATA\hadoop-2.6.4 HADOOP_CONF_DIR %HADOOP_HOME%/etc/hadoop 配置 hadoop-env.cmd在 hadoop 目录下的 \etc\hadoop\hadoop-env.cmd 文件 修改为以下，注意路径中有空格要写成如下 Progra~1 set JAVA_HOME=C:\Progra~1\Java\jdk1.8.0_191 验证 1234C:\software\cmder_miniλ hadoopUsage: hadoop [--config confdir] COMMANDwhere COMMAND is one of: 配置 core-site.xml路径%HADOOP_HOME%/etc/hadoop/core-site.xml 内容如下 123456&lt;configuration&gt; &lt;property&gt; &lt;name&gt;fs.default.name&lt;/name&gt; &lt;value&gt;hdfs://localhost:9000&lt;/value&gt; &lt;/property&gt;&lt;/configuration&gt; 配置 hdfs-site.xml 首先要创建 data 目录 在 HADOOP_HOME下创建data 目录，再创建 data/datanode data/namenode两个目录 在 hadoop 目录下的 /etc/hadoop/hdfs-site.xml 修改为以下内容 1234567891011121314&lt;configuration&gt; &lt;property&gt; &lt;name&gt;dfs.replication&lt;/name&gt; &lt;value&gt;1&lt;/value&gt; &lt;/property&gt; &lt;property&gt; &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt; &lt;value&gt;file:///D:/BIGDATA/hadoop-2.6.4/data/namenode&lt;/value&gt; &lt;/property&gt; &lt;property&gt; &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt; &lt;value&gt;file:///D:/BIGDATA/hadoop-2.6.4/data/datanode&lt;/value&gt; &lt;/property&gt;&lt;/configuration&gt; 配置 yarn-site.xml在 hadoop 目录下的 /etc/hadoop/yarn-site.xml下 12345678910&lt;configuration&gt; &lt;property&gt; &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt; &lt;value&gt;mapreduce_shuffle&lt;/value&gt; &lt;/property&gt; &lt;property&gt; &lt;name&gt;yarn.nodemanager.auxservices.mapreduce.shuffle.class&lt;/name&gt; &lt;value&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;/value&gt; &lt;/property&gt;&lt;/configuration&gt; 替换bin目录 下载 winutils github 到本地，找到对应的版本 将 HADOOP_HOME 的 bin 目录删除 将 winutils-master 里对应版本的 bin 目录复制到 HADOOP_HOME下 格式化执行以下命令 1hdfs namenode –format 有以下输出 1219/08/29 12:49:17 INFO namenode.FSImage: Allocated new BlockPoolId: BP-1502620146-192.168.168.1-156705415741719/08/29 12:49:17 INFO common.Storage: Storage directory D:\BIGDATA\hadoop-2.6.4\data\namenode has been successfully formatted. 在 HADOOP_HOME下的 data/namenode 会生成一个目录 hadoop启动与关闭启动 进入 HADOOP_HOME\sbin 目录 双击 start-all.cmd 即可(或在 cmd 中调用) 关闭 进入 HADOOP_HOME\sbin 目录 双击 stop-all.cmd 即可(或在 cmd 中调用) 一些网址 说明 网址 NameNode http://localhost:50070 ResourceManage http://localhost:8088]]></content>
+      <categories>
+        <category>大数据</category>
+      </categories>
+      <tags>
+        <tag>hadoop</tag>
+        <tag>大数据</tag>
+        <tag>yarn</tag>
+        <tag>hdfs</tag>
+        <tag>windows</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[记一次pdf提取文本]]></title>
     <url>%2F2019%2F08%2F29%2F%E8%AE%B0%E4%B8%80%E6%AC%A1pdf%E6%8F%90%E5%8F%96%E6%96%87%E6%9C%AC%2F</url>
     <content type="text"><![CDATA[说明需要从 十几个pdf文件中提取 xml，本来想用 pdfbox 框架来直接转的，可是测试后发现转换出来的是乱码~，于是换个思路…… 思路 首页将需要提取的文件截图（可以写个脚本来做？有空看看）使用 ocr 来转换，我用的是 腾讯AI上的，然后写个程序去调 ocr 接口，将获取的结果写入xml中，然后再用 正则替换 来修正其中的一些格式问题。 优图OCR服务注意在 腾讯AI开放平台注册，然后创建应用，需要接入 通用OCR 能力，才能调api，不然会报 no auth 错误 点击 接入能力 选择你的应用即可 批量调用接口并生成xml项目github 正则替换记录我用的 vscode 软件来替换的 正则 替换文本 说明 ^\(|〈|&lt;\s+ &lt; &lt; 去空格 ( 改为 &lt; (&lt;[a-zA-Z]+)\) $1&gt; &lt;houseNumber) 改成 &lt;houseNumber&gt; 〉|\)$ &gt; 修正 &gt; \b’|’\s?|‘|”|’ “ &quot;修正 (=)\s(&quot;)\s $1$2 Code = &quot; IN 改成 Code = &quot;IN \s?(=)\s? $1 去掉 = 两边的空格 xsi:\s|xsi\s: xsi: xsi:type 修正 执行两次~ &lt;/\s|&lt;\s/ &lt;/ 修正 &lt;/ 去掉多余的空格 \s/&gt;|/\s&gt; /&gt; 修正 /&gt; 去掉多余的空格 ^&lt;!\s-+ &lt;!-- 修正 &lt;!-- (&lt;!-)(?!-) $1- &lt;!- 改成 &lt;!-- (?&lt;!-)(-&gt;)$ -$1 -&gt; 改成 --&gt; (\d)\s(\.) $1$2 2.16 .8改成 2.16.8 (\d\.)\s $1 2.16. 1 改成 2.16.1 \s(&quot;) $1 code=&quot;30954-2 &quot; 改成 code=&quot;30954-2&quot; (=&quot;)\s $1 typeCode=&quot; RCT&quot; 改成 typeCode=&quot;RCT&quot; (&lt;[a-zA-z]+)\) $1&gt; &lt;addr) 改成 &lt;addr&gt; (?&lt;=&quot;)(?=[a-zA-Z]+=) 空格 &quot;2&quot;unit= 改成 &quot;2&quot; unit= (=&quot;)\s $1 root=&quot; 2 改成 root=&quot;2 (?&lt;=&lt;/)([a-zA-Z]+)\s $1 &lt;/entryRelat ionship&gt;改成 &lt;/entryRelationship&gt; 应多次执行 (?&lt;=&lt;/?)([a-zA-Z]+$) $1&gt; &lt;/observation 改成 &lt;/observation&gt; (&lt;[a-zA-Z]+) (?!xsi:type)(?!/&gt;)(?![a-zA-Z:]+=) $1 &lt;entryRelat ionship 改成 &lt;entryRelationship 需要多次调用以防 出现 &lt;entry Relat ionship这种情况 (&lt;[a-zA-Z]+)\.\s* $1 &lt;ass. igned 改成 &lt;assigned (\s[a-zA-Z]+)\s([a-zA-Z]+=) $1$2 extens ion=&quot;PO改成 extension=&quot;PO (\.)\n $1 将以 . 结尾的换行符去掉 \n^(=) $1 将以 =开头的前一个换行符去掉 &quot;$\n &quot;空格 将以&quot; 结尾的换行符替换来空格]]></content>
+      <categories>
+        <category>未分类</category>
+      </categories>
       <tags>
         <tag>正则表达式</tag>
         <tag>ocr</tag>
