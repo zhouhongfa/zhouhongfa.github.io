@@ -28,9 +28,9 @@
     scheme: 'Muse',
     version: '7.3.0',
     exturl: false,
-    sidebar: {"position":"right","display":"hide","offset":12,"onmobile":false},
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
     fancybox: false,
     mediumzoom: false,
@@ -55,14 +55,14 @@
 </script>
 
   <meta name="description" content="版本   组件 版本    hadoop 2.6.4   jdk 1.8">
-<meta name="keywords" content="hadoop,大数据,yarn,hdfs,windows">
+<meta name="keywords" content="大数据,windows,hadoop,yarn,hdfs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在windows上安装hadoop2.6.4">
 <meta property="og:url" content="https://zhouhongfa.github.io/2019/08/29/在windows上安装hadoop/index.html">
-<meta property="og:site_name" content="博客">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
 <meta property="og:description" content="版本   组件 版本    hadoop 2.6.4   jdk 1.8">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-29T05:15:09.117Z">
+<meta property="og:updated_time" content="2019-08-31T01:57:19.066Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在windows上安装hadoop2.6.4">
 <meta name="twitter:description" content="版本   组件 版本    hadoop 2.6.4   jdk 1.8">
@@ -80,7 +80,7 @@
   };
 </script>
 
-  <title>在windows上安装hadoop2.6.4 | 博客</title>
+  <title>在windows上安装hadoop2.6.4 | zhouhongfa's Blog</title>
   <meta name="generator" content="Hexo 3.9.0">
   
 
@@ -130,10 +130,12 @@
     <div>
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">博客</span>
+        <span class="site-title">zhouhongfa's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
+        <p class="site-subtitle">多总结</p>
+      
   </div>
 
   <div class="site-nav-toggle">
@@ -262,7 +264,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客">
+      <meta itemprop="name" content="zhouhongfa's Blog">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">在windows上安装hadoop2.6.4
@@ -281,11 +283,19 @@
                 
               
 
-              <time title="创建时间：2019-08-29 11:31:30 / 修改时间：13:15:09" itemprop="dateCreated datePublished" datetime="2019-08-29T11:31:30+08:00">2019-08-29</time>
+              <time title="创建时间：2019-08-29 11:31:30" itemprop="dateCreated datePublished" datetime="2019-08-29T11:31:30+08:00">2019-08-29</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-31 09:57:19" itemprop="dateModified" datetime="2019-08-31T09:57:19+08:00">2019-08-31</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -350,6 +360,10 @@
 <td><code>HADOOP_CONF_DIR</code></td>
 <td><code>%HADOOP_HOME%/etc/hadoop</code></td>
 </tr>
+<tr>
+<td><code>PATH</code></td>
+<td>增加 <code>%HADOOP_HOME%\bin</code></td>
+</tr>
 </tbody></table>
 <h3 id="配置-hadoop-env-cmd"><a href="#配置-hadoop-env-cmd" class="headerlink" title="配置 hadoop-env.cmd"></a>配置 <code>hadoop-env.cmd</code></h3><p>在 <code>hadoop</code> 目录下的 <code>\etc\hadoop\hadoop-env.cmd</code> 文件</p>
 <p>修改为以下，注意路径中有空格要写成如下 <code>Progra~1</code> </p>
@@ -380,7 +394,7 @@
 <li><p>将 <code>winutils-master</code> 里对应版本的 <code>bin</code> 目录复制到 <code>HADOOP_HOME</code>下</p>
 </li>
 </ol>
-<h3 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h3><p>执行以下命令</p>
+<h3 id="格式化"><a href="#格式化" class="headerlink" title="格式化"></a>格式化</h3><p>执行以下命令(<code>cmder</code> 不行，要用<code>cmd</code>执行)</p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdfs namenode –format</span><br></pre></td></tr></table></figure>
 
 <p>有以下输出</p>
@@ -424,15 +438,15 @@
           
           <div class="post-tags">
             
-              <a href="/tags/hadoop/" rel="tag"># hadoop</a>
-            
               <a href="/tags/大数据/" rel="tag"># 大数据</a>
+            
+              <a href="/tags/windows/" rel="tag"># windows</a>
+            
+              <a href="/tags/hadoop/" rel="tag"># hadoop</a>
             
               <a href="/tags/yarn/" rel="tag"># yarn</a>
             
               <a href="/tags/hdfs/" rel="tag"># hdfs</a>
-            
-              <a href="/tags/windows/" rel="tag"># windows</a>
             
           </div>
         
@@ -451,6 +465,10 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/29/在windows上安装及配置Spark/" rel="prev" title="在windows上安装及配置Spark">
+                  在windows上安装及配置Spark <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -521,7 +539,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">19</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -544,7 +562,17 @@
         
           
         
-        <span class="site-state-item-count">4</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -595,7 +623,29 @@
         
           
         
-        <span class="site-state-item-count">18</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+<meta name="keywords" content="Spark,phoenix">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Phoenix Spark Plugin 使用">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/08/31/Phoenix-phoenix-spark插件使用记录/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-31T10:48:55.048Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Phoenix Spark Plugin 使用">
+<meta name="twitter:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/31/Phoenix-phoenix-spark插件使用记录/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Phoenix Spark Plugin 使用 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/08/31/Phoenix-phoenix-spark插件使用记录/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Phoenix Spark Plugin 使用
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-31 13:46:15 / 修改时间：18:48:55" itemprop="dateCreated datePublished" datetime="2019-08-31T13:46:15+08:00">2019-08-31</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Spark/" itemprop="url" rel="index"><span itemprop="name">Spark</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h2><p>如果要用 phoenix 的 spark 插件，注意有些版本只支持spark <code>1.x</code> ，scala也要相应地修改~</p>
+<blockquote>
+<p>版本问题待解决，官方说2.x是没问题的~</p>
+</blockquote>
+<p>这里我用 的版本如下</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Spark</td>
+<td>spark-1.6.2-bin-hadoop2.6</td>
+</tr>
+<tr>
+<td>phoenix</td>
+<td>apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix</td>
+</tr>
+<tr>
+<td>scala</td>
+<td>2.10.6</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://phoenix.apache.org/phoenix_spark.html" target="_blank" rel="noopener">https://phoenix.apache.org/phoenix_spark.html</a></p>
+<h2 id="创建示例表"><a href="#创建示例表" class="headerlink" title="创建示例表"></a>创建示例表</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> TABLE1 (<span class="keyword">ID</span> <span class="built_in">BIGINT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> PRIMARY <span class="keyword">KEY</span>, COL1 <span class="built_in">VARCHAR</span>);</span><br><span class="line">UPSERT INTO TABLE1 (ID, COL1) <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="string">'test_row_1'</span>);</span><br><span class="line">UPSERT INTO TABLE1 (ID, COL1) <span class="keyword">VALUES</span> (<span class="number">2</span>, <span class="string">'test_row_2'</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建应用"><a href="#创建应用" class="headerlink" title="创建应用"></a>创建应用</h2><p>用 <code>IDEA</code>  创建 <code>Scala</code> 项目</p>
+<p><strong>build.sbt</strong></p>
+<p>如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">name := &quot;scala-spark-demo&quot;</span><br><span class="line"></span><br><span class="line">version := &quot;0.1&quot;</span><br><span class="line"></span><br><span class="line">scalaVersion := &quot;2.10.6&quot;</span><br><span class="line"></span><br><span class="line">resolvers += &quot;aliyun&quot; at &quot;http://maven.aliyun.com/nexus/content/groups/public/&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Project-Structure-配置"><a href="#Project-Structure-配置" class="headerlink" title="Project Structure 配置"></a>Project Structure 配置</h3><p><strong>Libraries</strong> 配置</p>
+
+
+
+
+
+
+<h2 id="读取Phoenix表"><a href="#读取Phoenix表" class="headerlink" title="读取Phoenix表"></a>读取Phoenix表</h2><p><strong>src/main/resources/log4j.properties</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># Set everything to be logged to the console</span><br><span class="line">log4j.rootCategory=WARN, console</span><br><span class="line">log4j.appender.console=org.apache.log4j.ConsoleAppender</span><br><span class="line">log4j.appender.console.target=System.err</span><br><span class="line">log4j.appender.console.layout=org.apache.log4j.PatternLayout</span><br><span class="line">log4j.appender.console.layout.ConversionPattern=%d&#123;yy/MM/dd HH:mm:ss&#125; %p %c&#123;1&#125;: %m%n</span><br><span class="line"># Set the default spark-shell log level to WARN. When running the spark-shell, the</span><br><span class="line"># log level for this class is used to overwrite the root logger&apos;s log level, so that</span><br><span class="line"># the user can have different defaults for the shell and regular Spark apps.</span><br><span class="line">log4j.logger.org.apache.spark.repl.Main=WARN</span><br><span class="line"># Settings to quiet third party logs that are too verbose</span><br><span class="line">log4j.logger.org.spark_project.jetty=WARN</span><br><span class="line">log4j.logger.org.spark_project.jetty.util.component.AbstractLifeCycle=ERROR</span><br><span class="line">log4j.logger.org.apache.spark.repl.SparkIMain$exprTyper=INFO</span><br><span class="line">log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter=INFO</span><br><span class="line">log4j.logger.org.apache.parquet=ERROR</span><br><span class="line">log4j.logger.parquet=ERROR</span><br><span class="line">log4j.logger.org.apache.spark.util.ShutdownHookManager=OFF</span><br><span class="line">log4j.logger.org.apache.spark.SparkEnv=ERROR</span><br><span class="line"># SPARK-9183: Settings to avoid annoying messages when looking up nonexistent UDFs in SparkSQL with Hive support</span><br><span class="line">log4j.logger.org.apache.hadoop.hive.metastore.RetryingHMSHandler=FATAL</span><br><span class="line">log4j.logger.org.apache.hadoop.hive.ql.exec.FunctionRegistry=ERROR</span><br></pre></td></tr></table></figure>
+
+<p>如果开启了 <code>phoenix.schema.isNamespaceMappingEnabled</code> ，需要增加以下文件</p>
+<p><strong>src/main/resources/hbase-site.xml</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>phoenix.schema.isNamespaceMappingEnabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用Data-Source-API加载为DataFrame"><a href="#使用Data-Source-API加载为DataFrame" class="headerlink" title="使用Data Source API加载为DataFrame"></a>使用Data Source API加载为DataFrame</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SQLContext</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">PhoenixTest3</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="string">"local"</span>, <span class="string">"phoenix-test"</span>)</span><br><span class="line">    <span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> df = sqlContext.load(</span><br><span class="line">      <span class="string">"org.apache.phoenix.spark"</span>,</span><br><span class="line">      <span class="type">Map</span>(<span class="string">"table"</span> -&gt; <span class="string">"TABLE1"</span>, <span class="string">"zkUrl"</span> -&gt; <span class="string">"cdh01:2181"</span>)</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    df</span><br><span class="line">      .filter(df(<span class="string">"COL1"</span>) === <span class="string">"test_row_1"</span> &amp;&amp; df(<span class="string">"ID"</span>) === <span class="number">1</span>L)</span><br><span class="line">      .select(df(<span class="string">"ID"</span>))</span><br><span class="line">      .show</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+---+</span><br><span class="line">| ID|</span><br><span class="line">+---+</span><br><span class="line">|  1|</span><br><span class="line">+---+</span><br></pre></td></tr></table></figure>
+
+<h3 id="打包提交测试1"><a href="#打包提交测试1" class="headerlink" title="打包提交测试1"></a>打包提交测试1</h3><p>打包时按照需求是否将 <code>phoenix</code> 依赖打进去，如果服务器有的话就不用了，打包方法</p>
+<p><code>Ctrl+Alt+Shift+S</code> 打开项目配置界面</p>
+<p>配置需要打包的lib</p>
+<p>注意要选择 <code>Extract into output root</code></p>
+<p>提交任务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark-submit --class com.yibo.examples.PhoenixTest3 --master yarn --deploy-mode client --driver-cores 1  --driver-memory 512M --num-executors 2 --executor-cores 2 --executor-memory 512M  D:\zhf\Documents\projects\git\scala-spark-demo\out\artifacts\SparkOperateHBase__jar\scala-spark-demo.jar</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用Configuration对象直接加载为DataFrame"><a href="#使用Configuration对象直接加载为DataFrame" class="headerlink" title="使用Configuration对象直接加载为DataFrame"></a>使用Configuration对象直接加载为DataFrame</h3><p>这个好像不加载 <code>hbase-site.xml</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.conf.<span class="type">Configuration</span></span><br><span class="line"><span class="keyword">import</span> org.apache.phoenix.spark._</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SQLContext</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">PhoenixTest3</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> configuration = <span class="keyword">new</span> <span class="type">Configuration</span>()</span><br><span class="line">    <span class="comment">//配置zookeeper</span></span><br><span class="line">    configuration.set(<span class="string">"hbase.zookeeper.quorum"</span>, <span class="string">"cdh01"</span>);</span><br><span class="line">    <span class="comment">//开启了phoenix.schema.isNamespaceMappingEnabled，则需要配置这个</span></span><br><span class="line">    configuration.set(<span class="string">"phoenix.schema.isNamespaceMappingEnabled"</span>, <span class="string">"true"</span>);</span><br><span class="line">    <span class="comment">// Can set Phoenix-specific settings, requires 'hbase.zookeeper.quorum'</span></span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="string">"local"</span>, <span class="string">"phoenix-test"</span>)</span><br><span class="line">    <span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Load the columns 'ID' and 'COL1' from TABLE1 as a DataFrame</span></span><br><span class="line">    <span class="keyword">val</span> df = sqlContext.phoenixTableAsDataFrame(</span><br><span class="line">      <span class="string">"TABLE1"</span>, <span class="type">Array</span>(<span class="string">"ID"</span>, <span class="string">"COL1"</span>), conf = configuration</span><br><span class="line">    )</span><br><span class="line">    df.show</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+---+----------+</span><br><span class="line">| ID|      COL1|</span><br><span class="line">+---+----------+</span><br><span class="line">|  1|test_row_1|</span><br><span class="line">|  2|test_row_2|</span><br><span class="line">+---+----------+</span><br></pre></td></tr></table></figure>
+
+<h2 id="写入-Phoenix表"><a href="#写入-Phoenix表" class="headerlink" title="写入 Phoenix表"></a>写入 Phoenix表</h2><p>创建以下 <code>Phoenix</code> 表进行测试</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> OUTPUT_TEST_TABLE (<span class="keyword">id</span> <span class="built_in">BIGINT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> PRIMARY <span class="keyword">KEY</span>, col1 <span class="built_in">VARCHAR</span>, col2 <span class="built_in">INTEGER</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="保存RDD"><a href="#保存RDD" class="headerlink" title="保存RDD"></a>保存RDD</h3><p>saveToPhoenix方法是RDD [Product]上的隐式方法，或者是元组的RDD。数据类型必须与Phoenix支持的某种Java类型相对应。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span></span><br><span class="line"><span class="keyword">import</span> org.apache.phoenix.spark._</span><br><span class="line"></span><br><span class="line"><span class="comment">// RDD写入</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">PhoenixRDDWriteTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="string">"local"</span>, <span class="string">"phoenix-test"</span>)</span><br><span class="line">    <span class="keyword">val</span> dataSet = <span class="type">List</span>((<span class="number">1</span>L, <span class="string">"1"</span>, <span class="number">1</span>), (<span class="number">2</span>L, <span class="string">"2"</span>, <span class="number">2</span>), (<span class="number">3</span>L, <span class="string">"3"</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">    sc</span><br><span class="line">      .parallelize(dataSet)</span><br><span class="line">      .saveToPhoenix(</span><br><span class="line">        <span class="string">"OUTPUT_TEST_TABLE"</span>,</span><br><span class="line">        <span class="type">Seq</span>(<span class="string">"ID"</span>,<span class="string">"COL1"</span>,<span class="string">"COL2"</span>),</span><br><span class="line">        zkUrl = <span class="type">Some</span>(<span class="string">"cdh01:2181"</span>)</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查询 <code>phoenix</code> 表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">0: jdbc:phoenix:&gt; select * from output_test_table;</span><br><span class="line">+-----+-------+-------+</span><br><span class="line">| ID  | COL1  | COL2  |</span><br><span class="line">+-----+-------+-------+</span><br><span class="line">| 1   | 1     | 1     |</span><br><span class="line">| 2   | 2     | 2     |</span><br><span class="line">| 3   | 3     | 3     |</span><br><span class="line">+-----+-------+-------+</span><br></pre></td></tr></table></figure>
+
+<h3 id="保存DataFrames"><a href="#保存DataFrames" class="headerlink" title="保存DataFrames"></a>保存DataFrames</h3><p>save是DataFrame上的方法允许传入数据源类型。您可以使用org.apache.phoenix.spark，还必须传入一个表和zkUrl参数来指定要将DataFrame保留到哪个表和服务器。列名称是从DataFrame的架构字段名称派生的，并且必须与Phoenix列名称匹配。</p>
+<p>save方法还采用SaveMode选项，仅支持SaveMode.Overwrite。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">CREATE</span> <span class="type">TABLE</span> <span class="type">INPUT_TABLE</span> (id <span class="type">BIGINT</span> <span class="type">NOT</span> <span class="type">NULL</span> <span class="type">PRIMARY</span> <span class="type">KEY</span>, col1 <span class="type">VARCHAR</span>, col2 <span class="type">INTEGER</span>);</span><br><span class="line"><span class="type">CREATE</span> <span class="type">TABLE</span> <span class="type">OUTPUT_TABLE</span> (id <span class="type">BIGINT</span> <span class="type">NOT</span> <span class="type">NULL</span> <span class="type">PRIMARY</span> <span class="type">KEY</span>, col1 <span class="type">VARCHAR</span>, col2 <span class="type">INTEGER</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">upsert into input_table values(1,&apos;11&apos;,111);</span><br><span class="line">upsert into input_table values(2,&apos;22&apos;,222);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql._</span><br><span class="line"><span class="keyword">import</span> org.apache.phoenix.spark._</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">PhoenixSaveTest</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="comment">// Load INPUT_TABLE</span></span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="string">"local"</span>, <span class="string">"phoenix-test"</span>)</span><br><span class="line">    <span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line">    <span class="keyword">val</span> hbaseConnectionString = <span class="string">"cdh01:2181"</span></span><br><span class="line">    <span class="keyword">val</span> df = sqlContext.load(<span class="string">"org.apache.phoenix.spark"</span>, <span class="type">Map</span>(<span class="string">"table"</span> -&gt; <span class="string">"INPUT_TABLE"</span>,</span><br><span class="line">      <span class="string">"zkUrl"</span> -&gt; hbaseConnectionString))</span><br><span class="line">    <span class="comment">// Save to OUTPUT_TABLE</span></span><br><span class="line">    df.saveToPhoenix(<span class="type">Map</span>(<span class="string">"table"</span> -&gt; <span class="string">"OUTPUT_TABLE"</span>, <span class="string">"zkUrl"</span> -&gt; hbaseConnectionString))</span><br><span class="line">    <span class="comment">//或者</span></span><br><span class="line"><span class="comment">//    df.write</span></span><br><span class="line"><span class="comment">//      .format("org.apache.phoenix.spark")</span></span><br><span class="line"><span class="comment">//      .mode("overwrite")</span></span><br><span class="line"><span class="comment">//      .option("table", "OUTPUT_TABLE")</span></span><br><span class="line"><span class="comment">//      .option("zkUrl", hbaseConnectionString)</span></span><br><span class="line"><span class="comment">//      .save()</span></span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查询 <code>output_test</code> 表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0: jdbc:phoenix:&gt; select * from output_table;</span><br><span class="line">+-----+-------+-------+</span><br><span class="line">| ID  | COL1  | COL2  |</span><br><span class="line">+-----+-------+-------+</span><br><span class="line">| 1   | 11    | 111   |</span><br><span class="line">+-----+-------+-------+</span><br></pre></td></tr></table></figure>
+
+<h2 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cannot initiate connection as SYSTEM:CATALOG is found but client does not have phoenix.schema.isNamespaceMappingEnabled enabled</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>src/main/resources</code> 增加 <code>hbase-site.xml</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>phoenix.schema.isNamespaceMappingEnabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/apache/spark/sql/DataFrame</span><br></pre></td></tr></table></figure>
+
+<p>2.x版本问题~(但是官网说2.x是可以用的啊，我试过 2.x下 dataset写是可以的 读会报 Dataset找不到 写会报 上面的错)</p>
+<p>降成 <code>1.x</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error:(16, 25) value phoenixTableAsDataFrame is not a member of org.apache.spark.sql.SQLContext</span><br><span class="line">    val df = sqlContext.phoenixTableAsDataFrame(</span><br></pre></td></tr></table></figure>
+
+<p>增加 <code>import org.apache.phoenix.spark._</code>即可~</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Spark/" rel="tag"># Spark</a>
+            
+              <a href="/tags/phoenix/" rel="tag"># phoenix</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/30/Scala之旅一-基础知识/" rel="next" title="Scala之旅一-基础知识">
+                  <i class="fa fa-chevron-left"></i> Scala之旅一-基础知识
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/31/Phoenix-安装4-8/" rel="prev" title="Phoenix-安装4.8">
+                  Phoenix-安装4.8 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#版本说明"><span class="nav-number">1.</span> <span class="nav-text">版本说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建示例表"><span class="nav-number">3.</span> <span class="nav-text">创建示例表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建应用"><span class="nav-number">4.</span> <span class="nav-text">创建应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Project-Structure-配置"><span class="nav-number">4.1.</span> <span class="nav-text">Project Structure 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取Phoenix表"><span class="nav-number">5.</span> <span class="nav-text">读取Phoenix表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Data-Source-API加载为DataFrame"><span class="nav-number">5.1.</span> <span class="nav-text">使用Data Source API加载为DataFrame</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打包提交测试1"><span class="nav-number">5.2.</span> <span class="nav-text">打包提交测试1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Configuration对象直接加载为DataFrame"><span class="nav-number">5.3.</span> <span class="nav-text">使用Configuration对象直接加载为DataFrame</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写入-Phoenix表"><span class="nav-number">6.</span> <span class="nav-text">写入 Phoenix表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#保存RDD"><span class="nav-number">6.1.</span> <span class="nav-text">保存RDD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#保存DataFrames"><span class="nav-number">6.2.</span> <span class="nav-text">保存DataFrames</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#报错信息"><span class="nav-number">7.</span> <span class="nav-text">报错信息</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: '047bf2bf94442e80269eeb087783fe26',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

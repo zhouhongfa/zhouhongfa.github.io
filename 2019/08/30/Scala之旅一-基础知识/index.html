@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="官方文档 表达式表达式是可计算的语句。">
+<meta name="keywords" content="Scala">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scala之旅一-基础知识">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/08/30/Scala之旅一-基础知识/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="官方文档 表达式表达式是可计算的语句。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-31T06:33:51.350Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scala之旅一-基础知识">
+<meta name="twitter:description" content="官方文档 表达式表达式是可计算的语句。">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/30/Scala之旅一-基础知识/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Scala之旅一-基础知识 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/08/30/Scala之旅一-基础知识/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Scala之旅一-基础知识
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-30 22:53:40" itemprop="dateCreated datePublished" datetime="2019-08-30T22:53:40+08:00">2019-08-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-31 14:33:51" itemprop="dateModified" datetime="2019-08-31T14:33:51+08:00">2019-08-31</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Scala/" itemprop="url" rel="index"><span itemprop="name">Scala</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="https://docs.scala-lang.org/tour/basics.html" target="_blank" rel="noopener">官方文档</a></p>
+<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><p>表达式是可计算的语句。</p>
+<a id="more"></a>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1 + 1</span><br></pre></td></tr></table></figure>
+
+<p>可以使用 <code>println</code> 来输出表达式结果</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">println(<span class="number">1</span>) <span class="comment">// 1</span></span><br><span class="line">println(<span class="number">1</span> + <span class="number">1</span>) <span class="comment">// 2</span></span><br><span class="line">println(<span class="string">"Hello!"</span>) <span class="comment">// Hello!</span></span><br><span class="line">println(<span class="string">"Hello,"</span> + <span class="string">" world!"</span>) <span class="comment">// Hello, world!</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="值"><a href="#值" class="headerlink" title="值"></a>值</h3><p>您可以使用 <code>val</code> 关键字命名表达式的结果。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> x = <span class="number">1</span> + <span class="number">1</span></span><br><span class="line">println(x) <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<p>命名结果（例如x）称为值。引用值不会重新计算它。</p>
+<p>无法重新分配值。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x = <span class="number">3</span> <span class="comment">// 不能通过编译.</span></span><br></pre></td></tr></table></figure>
+
+<p>值的类型可以被推断出来，但您也可以显式声明类型，如下所示：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> x: <span class="type">Int</span> = <span class="number">1</span> + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>注意是如何声明类型的， <code>Int</code>  跟在标识符 <code>x</code> 之后，还需要一个 <code>:</code>。</p>
+<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><p>变量就像值，除了你可以重新赋值。您可以使用 <code>var</code> 关键字定义变量。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x = <span class="number">1</span> + <span class="number">1</span></span><br><span class="line">x = <span class="number">3</span> <span class="comment">// 编译通过， 因为 "x" 是用 "var" 关键字声明的。</span></span><br><span class="line">println(x * x) <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+
+<p>与值一样，您可以根据需要明确说明类型：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x: <span class="type">Int</span> = <span class="number">1</span> + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="块"><a href="#块" class="headerlink" title="块"></a>块</h2><blockquote>
+<p><code>Blocks</code></p>
+</blockquote>
+<p>您可以通过用 <code>{}</code> 表达式来组合表达式。我们称之为 <code>块</code>。</p>
+<p>块中最后一个表达式的结果也是整个块的结果。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">println(&#123;</span><br><span class="line">  <span class="keyword">val</span> x = <span class="number">1</span> + <span class="number">1</span></span><br><span class="line">  x + <span class="number">1</span></span><br><span class="line">&#125;) <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>函数是带参数的表达式。</p>
+<p>您可以定义一个返回给定整数加一的匿名函数（即无名称）：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x: <span class="type">Int</span>) =&gt; x + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>方法的外观和行为与函数非常相似，但它们之间存在一些关键差异。</p>
+<p>方法使用 <code>def</code> 关键字定义。 <code>def</code> 之后是名称，参数列表，返回类型和正文。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x + y</span><br><span class="line">println(add(<span class="number">1</span>, <span class="number">2</span>)) <span class="comment">// 3</span></span><br></pre></td></tr></table></figure>
+
+<p>注意返回值类型在参数列表后有 <code>:Int</code></p>
+<p>方法可以采用多个参数列表。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">addThenMultiply</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>)(multiplier: <span class="type">Int</span>): <span class="type">Int</span> = (x + y) * multiplier</span><br><span class="line">println(addThenMultiply(<span class="number">1</span>, <span class="number">2</span>)(<span class="number">3</span>)) <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+
+<p>或者根本没有参数列表。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">name</span></span>: <span class="type">String</span> = <span class="type">System</span>.getProperty(<span class="string">"user.name"</span>)</span><br><span class="line">println(<span class="string">"Hello, "</span> + name + <span class="string">"!"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>还有一些其他差异，但就目前而言，您可以将它们视为与函数类似的东西。</p>
+<p>方法也可以有多行表达式。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getSquareString</span></span>(input: <span class="type">Double</span>): <span class="type">String</span> = &#123;</span><br><span class="line">  <span class="keyword">val</span> square = input * input</span><br><span class="line">  square.toString</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法体中的最后一个表达式是方法的返回值。 （Scala确实有一个 <code>return</code> 关键字，但它很少使用。）</p>
+<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><p>您可以使用 <code>class</code> 关键字定义类，后跟其名称和构造函数参数。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Greeter</span>(<span class="params">prefix: <span class="type">String</span>, suffix: <span class="type">String</span></span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">greet</span></span>(name: <span class="type">String</span>): <span class="type">Unit</span> =</span><br><span class="line">    println(prefix + name + suffix)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法 <code>greet</code> 的返回类型是 <code>Unit</code>，它表示无返回值。它与 Java和 C 中的<code>void</code> 类似地使用。（不同之处在于，因为每个Scala表达式都必须具有某些值，所以实际上存在Unit类型的单例值，写作()。它不携带任何信息。）</p>
+<p>您可以使用 <code>new</code> 关键字创建类的实例。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> greeter = <span class="keyword">new</span> <span class="type">Greeter</span>(<span class="string">"Hello, "</span>, <span class="string">"!"</span>)</span><br><span class="line">greeter.greet(<span class="string">"Scala developer"</span>) <span class="comment">// Hello, Scala developer!</span></span><br></pre></td></tr></table></figure>
+
+<p>我们后面将深入介绍类。</p>
+<h2 id="Case-类"><a href="#Case-类" class="headerlink" title="Case 类"></a>Case 类</h2><p>Scala有一种特殊类型的类，称为“case”类。默认情况下，case类是不可变的，并按值进行比较。您可以使用 <code>case class</code> 关键字来定义。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Point</span>(<span class="params">x: <span class="type">Int</span>, y: <span class="type">Int</span></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>您可以在没有 <code>new</code> 关键字的情况下实例化 Case 类。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> point = <span class="type">Point</span>(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">val</span> anotherPoint = <span class="type">Point</span>(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">val</span> yetAnotherPoint = <span class="type">Point</span>(<span class="number">2</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p>并且它们按值进行比较。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (point == anotherPoint) &#123;</span><br><span class="line">  println(point + <span class="string">" and "</span> + anotherPoint + <span class="string">" are the same."</span>)</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  println(point + <span class="string">" and "</span> + anotherPoint + <span class="string">" are different."</span>)</span><br><span class="line">&#125; <span class="comment">// Point(1,2) and Point(1,2) are the same.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (point == yetAnotherPoint) &#123;</span><br><span class="line">  println(point + <span class="string">" and "</span> + yetAnotherPoint + <span class="string">" are the same."</span>)</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  println(point + <span class="string">" and "</span> + yetAnotherPoint + <span class="string">" are different."</span>)</span><br><span class="line">&#125; <span class="comment">// Point(1,2) and Point(2,2) are different.</span></span><br></pre></td></tr></table></figure>
+
+<p>我们想介绍的 <code>Case 类</code> 还有很多，我们相信你会爱上它们！我们将在稍后深入介绍它们。</p>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><p>对象是它们自己定义的单个实例。你可以把它们想象成是它们自己类中的单例。</p>
+<p>您可以使用 <code>object</code> 关键字定义对象。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">IdFactory</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">var</span> counter = <span class="number">0</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">create</span></span>(): <span class="type">Int</span> = &#123;</span><br><span class="line">    counter += <span class="number">1</span></span><br><span class="line">    counter</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>您可以通过引用其名称来访问该对象。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> newId: <span class="type">Int</span> = <span class="type">IdFactory</span>.create()</span><br><span class="line">println(newId) <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">val</span> newerId: <span class="type">Int</span> = <span class="type">IdFactory</span>.create()</span><br><span class="line">println(newerId) <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<p>我们将在以后深入介绍对象。</p>
+<h2 id="Traits"><a href="#Traits" class="headerlink" title="Traits"></a>Traits</h2><blockquote>
+<p>特征？</p>
+</blockquote>
+<p>特征是包含某些字段和方法的类型。可以组合多种特征。</p>
+<p>您可以使用 <code>trait</code> 关键字定义特征。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Greeter</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">greet</span></span>(name: <span class="type">String</span>): <span class="type">Unit</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>特征也可以有默认实现。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Greeter</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">greet</span></span>(name: <span class="type">String</span>): <span class="type">Unit</span> =</span><br><span class="line">    println(<span class="string">"Hello, "</span> + name + <span class="string">"!"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>您可以使用 <code>extends</code> 关键字扩展 traits 并使用 <code>override</code> 关键字覆盖实现。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DefaultGreeter</span> <span class="keyword">extends</span> <span class="title">Greeter</span></span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">CustomizableGreeter</span>(<span class="params">prefix: <span class="type">String</span>, postfix: <span class="type">String</span></span>) <span class="keyword">extends</span> <span class="title">Greeter</span> </span>&#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">greet</span></span>(name: <span class="type">String</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    println(prefix + name + postfix)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> greeter = <span class="keyword">new</span> <span class="type">DefaultGreeter</span>()</span><br><span class="line">greeter.greet(<span class="string">"Scala developer"</span>) <span class="comment">// Hello, Scala developer!</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> customGreeter = <span class="keyword">new</span> <span class="type">CustomizableGreeter</span>(<span class="string">"How are you, "</span>, <span class="string">"?"</span>)</span><br><span class="line">customGreeter.greet(<span class="string">"Scala developer"</span>) <span class="comment">// How are you, Scala developer?</span></span><br></pre></td></tr></table></figure>
+
+<p>在这里，<code>DefaultGreeter</code> 只扩展了一个特征，但它可以扩展多个特征。 我们稍后将深入介绍特征。</p>
+<h2 id="Main-方法"><a href="#Main-方法" class="headerlink" title="Main 方法"></a>Main 方法</h2><p>Main方法是程序的入口点。 Java虚拟机需要将main方法命名为 <code>main</code>，并接收一个字符串数组参数。</p>
+<p>使用对象，您可以按如下方式定义main方法：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> =</span><br><span class="line">    println(<span class="string">"Hello, Scala developer!"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Scala/" rel="tag"># Scala</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/30/Scala-语法风格之命名约定/" rel="next" title="Scala-语法风格之命名规范">
+                  <i class="fa fa-chevron-left"></i> Scala-语法风格之命名规范
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/31/Phoenix-phoenix-spark插件使用记录/" rel="prev" title="Phoenix Spark Plugin 使用">
+                  Phoenix Spark Plugin 使用 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#表达式"><span class="nav-number">1.</span> <span class="nav-text">表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#值"><span class="nav-number">1.1.</span> <span class="nav-text">值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">1.2.</span> <span class="nav-text">变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#块"><span class="nav-number">2.</span> <span class="nav-text">块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数"><span class="nav-number">3.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法"><span class="nav-number">4.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类"><span class="nav-number">5.</span> <span class="nav-text">类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Case-类"><span class="nav-number">6.</span> <span class="nav-text">Case 类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象"><span class="nav-number">7.</span> <span class="nav-text">对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Traits"><span class="nav-number">8.</span> <span class="nav-text">Traits</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Main-方法"><span class="nav-number">9.</span> <span class="nav-text">Main 方法</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: 'fdb9bbbd74e447fd284bf7e9894414e4',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

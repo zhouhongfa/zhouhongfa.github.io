@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="说明主要记录 Spark中读写Hbase 的操作记录">
+<meta name="keywords" content="Hbase,Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark学习-读写Hbase数据">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="说明主要记录 Spark中读写Hbase 的操作记录">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219522234.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219403082.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567148286652.png">
+<meta property="og:updated_time" content="2019-08-31T07:42:03.463Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark学习-读写Hbase数据">
+<meta name="twitter:description" content="说明主要记录 Spark中读写Hbase 的操作记录">
+<meta name="twitter:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Spark学习-读写Hbase数据 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spark学习-读写Hbase数据
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-30 12:58:39" itemprop="dateCreated datePublished" datetime="2019-08-30T12:58:39+08:00">2019-08-30</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-08-31 15:42:03" itemprop="dateModified" datetime="2019-08-31T15:42:03+08:00">2019-08-31</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Spark/" itemprop="url" rel="index"><span itemprop="name">Spark</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>主要记录 <code>Spark</code>中读写<code>Hbase</code> 的操作记录</p>
+<a id="more"></a>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://dblab.xmu.edu.cn/blog/1094-2/" target="_blank" rel="noopener">Spark入门：读写HBase数据</a></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="创建Hbase表"><a href="#创建Hbase表" class="headerlink" title="创建Hbase表"></a>创建Hbase表</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">D:\BIGDATA\hbase-1.2.0\bin</span><br><span class="line">λ hbase shell</span><br></pre></td></tr></table></figure>
+
+<p>查看所有表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hbase(main):001:0&gt; list</span><br><span class="line">TABLE</span><br><span class="line"></span><br><span class="line">0 row(s) in 0.1630 seconds</span><br><span class="line"></span><br><span class="line">=&gt; []</span><br></pre></td></tr></table></figure>
+
+<p>创建 <code>student</code> 表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase&gt;  create &apos;student&apos;,&apos;info&apos;</span><br></pre></td></tr></table></figure>
+
+<p>可通过 <code>describe</code> 命令查看“ student” 表的基本信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase&gt; describe &apos;student&apos;</span><br></pre></td></tr></table></figure>
+
+<h3 id="录入示例数据"><a href="#录入示例数据" class="headerlink" title="录入示例数据"></a>录入示例数据</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">put &apos;student&apos;,&apos;1&apos;,&apos;info:name&apos;,&apos;Xueqian&apos;</span><br><span class="line">put &apos;student&apos;,&apos;1&apos;,&apos;info:gender&apos;,&apos;F&apos;</span><br><span class="line">put &apos;student&apos;,&apos;1&apos;,&apos;info:age&apos;,&apos;23&apos;</span><br><span class="line">put &apos;student&apos;,&apos;2&apos;,&apos;info:name&apos;,&apos;Weiliang&apos;</span><br><span class="line">put &apos;student&apos;,&apos;2&apos;,&apos;info:gender&apos;,&apos;M&apos;</span><br><span class="line">put &apos;student&apos;,&apos;2&apos;,&apos;info:age&apos;,&apos;24&apos;</span><br></pre></td></tr></table></figure>
+
+<p>查看录入的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//如果每次只查看一行，就用下面命令</span><br><span class="line">hbase&gt; get &apos;student&apos;,&apos;1&apos;</span><br><span class="line">//如果每次查看全部数据，就用下面命令</span><br><span class="line">hbase&gt; scan &apos;student&apos;</span><br></pre></td></tr></table></figure>
+
+<h3 id="配置Spark"><a href="#配置Spark" class="headerlink" title="配置Spark"></a>配置Spark</h3><p>拷贝 <code>hbase</code> 的 jar 包到 <code>D:\BIGDATA\spark\spark-1.6.2-bin-hadoop2.6\lib\</code>下</p>
+<p>需要拷贝的jar文件包括：所有hbase开头的jar文件、guava-12.0.1.jar、htrace-core-3.1.0-incubating.jar和protobuf-java-2.5.0.jar</p>
+<p><code>windows</code> 上不知咋配~（下面我将 这些 <code>jar</code>作为 <code>Libraries</code> 来引用）</p>
+<p>参考 <a href="http://dblab.xmu.edu.cn/blog/1094-2/" target="_blank" rel="noopener">博客</a> 里配才是正确的吧~</p>
+<h2 id="编写读取Hbase的应用"><a href="#编写读取Hbase的应用" class="headerlink" title="编写读取Hbase的应用"></a>编写读取Hbase的应用</h2><h3 id="程序一"><a href="#程序一" class="headerlink" title="程序一"></a>程序一</h3><h4 id="Libiaries配置"><a href="#Libiaries配置" class="headerlink" title="Libiaries配置"></a>Libiaries配置</h4><p>如下引用 <code>hbase</code> 的 jar</p>
+<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png" title="引用jar">
+
+<p>如下引用 <code>spark</code> 的jar（这里我全引了~）</p>
+<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219522234.png" title="引用jar">
+
+<p>记得要 <code>Add to modules</code> </p>
+<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219403082.png" title="引用jar">
+
+<h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.<span class="type">HBaseConfiguration</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.mapreduce.<span class="type">TableInputFormat</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.util.<span class="type">Bytes</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark._</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">HbaseReader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//读取hbase数据</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line">    <span class="comment">//序列化</span></span><br><span class="line">    <span class="type">System</span>.setProperty(<span class="string">"spark.serializer"</span>, <span class="string">"org.apache.spark.serializer.KryoSerializer"</span>)</span><br><span class="line">    <span class="keyword">val</span> conf = <span class="type">HBaseConfiguration</span>.create()</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local"</span>).setAppName(<span class="string">"SparkOperateHBase"</span>))</span><br><span class="line">    <span class="comment">//设置查询的表名</span></span><br><span class="line">    conf.set(<span class="type">TableInputFormat</span>.<span class="type">INPUT_TABLE</span>, <span class="string">"student"</span>)</span><br><span class="line">    <span class="keyword">val</span> stuRDD = sc.newAPIHadoopRDD(conf, classOf[<span class="type">TableInputFormat</span>],</span><br><span class="line">      classOf[org.apache.hadoop.hbase.io.<span class="type">ImmutableBytesWritable</span>],</span><br><span class="line">      classOf[org.apache.hadoop.hbase.client.<span class="type">Result</span>])</span><br><span class="line">    <span class="keyword">val</span> count = stuRDD.count()</span><br><span class="line">    println(<span class="string">"Students RDD Count:"</span> + count)</span><br><span class="line">    stuRDD.cache()</span><br><span class="line">    <span class="comment">//遍历输出</span></span><br><span class="line">    stuRDD.foreach(&#123; <span class="keyword">case</span> (_, result) =&gt;</span><br><span class="line">      <span class="keyword">val</span> key = <span class="type">Bytes</span>.toString(result.getRow)</span><br><span class="line">      <span class="keyword">val</span> name = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"name"</span>.getBytes))</span><br><span class="line">      <span class="keyword">val</span> gender = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"gender"</span>.getBytes))</span><br><span class="line">      <span class="keyword">val</span> age = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"age"</span>.getBytes))</span><br><span class="line">      println(<span class="string">"Row key:"</span> + key + <span class="string">" Name:"</span> + name + <span class="string">" Gender:"</span> + gender + <span class="string">" Age:"</span> + age)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="运行程序"><a href="#运行程序" class="headerlink" title="运行程序"></a>运行程序</h4><p>直接启动 <code>com.yibo.examples.HbaseReader</code> 类</p>
+<h4 id="输出结果"><a href="#输出结果" class="headerlink" title="输出结果"></a>输出结果</h4><h4 id="提交程序一jar包到spark"><a href="#提交程序一jar包到spark" class="headerlink" title="提交程序一jar包到spark"></a>提交程序一jar包到spark</h4><p>打包</p>
+<p><code>Build</code> -&gt; <code>Build Arxx</code> -&gt; <code>Build</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spark-submit --class com.yibo.examples.HbaseReader --master yarn --deploy-mode client --driver-cores 1  --driver-memory 512M --num-executors 2 --executor-cores 2 --executor-memory 512M  D:\zhf\Documents\projects\git\scala-spark-demo\out\artifacts\SparkOperateHBase__jar\scala-spark-demo.jar</span><br></pre></td></tr></table></figure>
+
+<p>输出结果有以下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Students RDD Count:2</span><br><span class="line">Row key:1 Name:Xueqian Gender:F Age:23</span><br><span class="line">Row key:2 Name:Weiliang Gender:M Age:24</span><br></pre></td></tr></table></figure>
+
+<p>不打印 <code>Row key</code> 问题，增加 以下语句</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">System</span>.setProperty(<span class="string">"spark.serializer"</span>, <span class="string">"org.apache.spark.serializer.KryoSerializer"</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="编写写入Hbase的应用"><a href="#编写写入Hbase的应用" class="headerlink" title="编写写入Hbase的应用"></a>编写写入Hbase的应用</h2><p>在程序中增加 <code>SparkWriteHBase</code> 类</p>
+<p>代码如下</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.client.&#123;<span class="type">Put</span>, <span class="type">Result</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.io.<span class="type">ImmutableBytesWritable</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.mapreduce.<span class="type">TableOutputFormat</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.util.<span class="type">Bytes</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.<span class="type">Job</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark._</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">SparkWriteHBase</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> sparkConf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setAppName(<span class="string">"SparkWriteHBase"</span>).setMaster(<span class="string">"local"</span>)</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(sparkConf)</span><br><span class="line">    <span class="keyword">val</span> tablename = <span class="string">"student"</span></span><br><span class="line">    sc.hadoopConfiguration.set(<span class="type">TableOutputFormat</span>.<span class="type">OUTPUT_TABLE</span>, tablename)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> job = <span class="keyword">new</span> <span class="type">Job</span>(sc.hadoopConfiguration)</span><br><span class="line">    job.setOutputKeyClass(classOf[<span class="type">ImmutableBytesWritable</span>])</span><br><span class="line">    job.setOutputValueClass(classOf[<span class="type">Result</span>])</span><br><span class="line">    job.setOutputFormatClass(classOf[<span class="type">TableOutputFormat</span>[<span class="type">ImmutableBytesWritable</span>]])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">val</span> indataRDD = sc.makeRDD(<span class="type">Array</span>(<span class="string">"3,Rongcheng,M,26"</span>, <span class="string">"4,Guanhua,M,27"</span>)) <span class="comment">//构建两行记录</span></span><br><span class="line">    <span class="keyword">val</span> rdd = indataRDD.map(_.split(',')).map &#123; arr =&gt; &#123;</span><br><span class="line">      <span class="keyword">val</span> put = <span class="keyword">new</span> <span class="type">Put</span>(<span class="type">Bytes</span>.toBytes(arr(<span class="number">0</span>))) <span class="comment">//行健的值</span></span><br><span class="line">      put.add(<span class="type">Bytes</span>.toBytes(<span class="string">"info"</span>), <span class="type">Bytes</span>.toBytes(<span class="string">"name"</span>), <span class="type">Bytes</span>.toBytes(arr(<span class="number">1</span>))) <span class="comment">//info:name列的值</span></span><br><span class="line">      put.add(<span class="type">Bytes</span>.toBytes(<span class="string">"info"</span>), <span class="type">Bytes</span>.toBytes(<span class="string">"gender"</span>), <span class="type">Bytes</span>.toBytes(arr(<span class="number">2</span>))) <span class="comment">//info:gender列的值</span></span><br><span class="line">      put.add(<span class="type">Bytes</span>.toBytes(<span class="string">"info"</span>), <span class="type">Bytes</span>.toBytes(<span class="string">"age"</span>), <span class="type">Bytes</span>.toBytes(arr(<span class="number">3</span>).toInt)) <span class="comment">//info:age列的值</span></span><br><span class="line">      (<span class="keyword">new</span> <span class="type">ImmutableBytesWritable</span>, put)</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    rdd.saveAsNewAPIHadoopDataset(job.getConfiguration())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查询表数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase&gt; scan &apos;student&apos;</span><br></pre></td></tr></table></figure>
+
+<p>结果如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ROW                                    COLUMN+CELL                                                                                                   </span><br><span class="line"> 1                                     column=info:age, timestamp=1479640712163, value=23                                                            </span><br><span class="line"> 1                                     column=info:gender, timestamp=1479640704522, value=F                                                          </span><br><span class="line"> 1                                     column=info:name, timestamp=1479640696132, value=Xueqian                                                      </span><br><span class="line"> 2                                     column=info:age, timestamp=1479640752474, value=24                                                            </span><br><span class="line"> 2                                     column=info:gender, timestamp=1479640745276, value=M                                                          </span><br><span class="line"> 2                                     column=info:name, timestamp=1479640732763, value=Weiliang                                                     </span><br><span class="line"> 3                                     column=info:age, timestamp=1479643273142, value=\x00\x00\x00\x1A                                              </span><br><span class="line"> 3                                     column=info:gender, timestamp=1479643273142, value=M                                                          </span><br><span class="line"> 3                                     column=info:name, timestamp=1479643273142, value=Rongcheng                                                    </span><br><span class="line"> 4                                     column=info:age, timestamp=1479643273142, value=\x00\x00\x00\x1B                                              </span><br><span class="line"> 4                                     column=info:gender, timestamp=1479643273142, value=M                                                          </span><br><span class="line"> 4                                     column=info:name, timestamp=1479643273142, value=Guanhua                                                      </span><br><span class="line">4 row(s) in 0.3240 seconds</span><br></pre></td></tr></table></figure>
+
+<h2 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h2><h3 id="提交任务-时报错"><a href="#提交任务-时报错" class="headerlink" title="提交任务 时报错"></a><strong>提交任务</strong> 时报错</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/apache/hadoop/hbase/HBaseConfiguration</span><br></pre></td></tr></table></figure>
+
+<img src="/2019/08/30/Spark学习-读写Hbase数据/1567148286652.png" title="hbase-lib">
+
+<p>原因为没有配置<code>Spark</code> 中引用 <code>hbase</code> 的jar，如上图是将 <code>hbase</code>的依赖打进 <code>jar</code> 中</p>
+<hr>
+<h3 id="运行任务时出错"><a href="#运行任务时出错" class="headerlink" title="运行任务时出错"></a>运行任务时出错</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.lang.NoClassDefFoundError: com/yammer/metrics/core/Gauge</span><br></pre></td></tr></table></figure>
+
+<p>缺少 <code>metrics-core-2.2.0.jar</code> </p>
+<h3 id="日志打印问题"><a href="#日志打印问题" class="headerlink" title="日志打印问题"></a>日志打印问题</h3><p>在 <code>Libiaries</code> 中将 <code>sbt</code> 的 <code>logch</code> 去掉，仅使用 <code>spark</code> 下的 <code>slf4j</code> ，然后将 <code>SPARK_HOME/conf/log4j.properties</code>复制到项目中的 <code>src/main/resources</code> 下</p>
+<p>修改为 <code>WARN</code> ，就不会再打印一大堆日志了~</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Set everything to be logged to the console</span><br><span class="line">log4j.rootCategory=WARN, console</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Hbase/" rel="tag"># Hbase</a>
+            
+              <a href="/tags/Spark/" rel="tag"># Spark</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/30/在windows上安装Hbase/" rel="next" title="在windows上安装Hbase">
+                  <i class="fa fa-chevron-left"></i> 在windows上安装Hbase
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/30/Scala-语法风格之缩进/" rel="prev" title="Scala-语法风格之缩进">
+                  Scala-语法风格之缩进 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">3.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Hbase表"><span class="nav-number">3.1.</span> <span class="nav-text">创建Hbase表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#录入示例数据"><span class="nav-number">3.2.</span> <span class="nav-text">录入示例数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Spark"><span class="nav-number">3.3.</span> <span class="nav-text">配置Spark</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写读取Hbase的应用"><span class="nav-number">4.</span> <span class="nav-text">编写读取Hbase的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#程序一"><span class="nav-number">4.1.</span> <span class="nav-text">程序一</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Libiaries配置"><span class="nav-number">4.1.1.</span> <span class="nav-text">Libiaries配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码"><span class="nav-number">4.1.2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行程序"><span class="nav-number">4.1.3.</span> <span class="nav-text">运行程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#输出结果"><span class="nav-number">4.1.4.</span> <span class="nav-text">输出结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#提交程序一jar包到spark"><span class="nav-number">4.1.5.</span> <span class="nav-text">提交程序一jar包到spark</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写写入Hbase的应用"><span class="nav-number">5.</span> <span class="nav-text">编写写入Hbase的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些问题"><span class="nav-number">6.</span> <span class="nav-text">一些问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#提交任务-时报错"><span class="nav-number">6.1.</span> <span class="nav-text">提交任务 时报错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行任务时出错"><span class="nav-number">6.2.</span> <span class="nav-text">运行任务时出错</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#日志打印问题"><span class="nav-number">6.3.</span> <span class="nav-text">日志打印问题</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">29</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: 'ea83d1979a4e3bcd4202f587f07216e5',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>
