@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="说明这里以连接 phoenix 为示例，见 Phoenix Spark Plugin 使用  这里用的Spark版本为 1.6.2">
+<meta name="keywords" content="Spark,Dataframe,scala">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark-Dataframe笔记一">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/09/02/Spark-Dataframe笔记/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="说明这里以连接 phoenix 为示例，见 Phoenix Spark Plugin 使用  这里用的Spark版本为 1.6.2">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-07T09:05:48.043Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark-Dataframe笔记一">
+<meta name="twitter:description" content="说明这里以连接 phoenix 为示例，见 Phoenix Spark Plugin 使用  这里用的Spark版本为 1.6.2">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/09/02/Spark-Dataframe笔记/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Spark-Dataframe笔记一 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/09/02/Spark-Dataframe笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spark-Dataframe笔记一
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-02 11:23:21" itemprop="dateCreated datePublished" datetime="2019-09-02T11:23:21+08:00">2019-09-02</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-07 17:05:48" itemprop="dateModified" datetime="2019-09-07T17:05:48+08:00">2019-09-07</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Spark/" itemprop="url" rel="index"><span itemprop="name">Spark</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>这里以连接 <code>phoenix</code> 为示例，见</p>
+<a href="/2019/08/31/Phoenix-phoenix-spark插件使用记录/" title="Phoenix Spark Plugin 使用">Phoenix Spark Plugin 使用</a>
+
+<p>这里用的Spark版本为 <code>1.6.2</code></p>
+<a id="more"></a>
+
+<h2 id="测试表"><a href="#测试表" class="headerlink" title="测试表"></a>测试表</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> patient_test(<span class="keyword">id</span> <span class="built_in">varchar</span> primary <span class="keyword">key</span>,<span class="keyword">name</span> <span class="built_in">varchar</span>, id_number <span class="built_in">varchar</span>, phone <span class="built_in">varchar</span>, sex <span class="built_in">bigint</span>, file_number <span class="built_in">varchar</span>,empi <span class="built_in">varchar</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">upsert into patient_test values( &apos;1000&apos; ,&apos;王五&apos;,&apos;1234&apos;,&apos;12345&apos;,1,&apos;0001&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1001&apos; ,&apos;李四&apos;,&apos;1235&apos;,&apos;12346&apos;,1,&apos;0002&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1002&apos; ,&apos;张三&apos;,&apos;1236&apos;,&apos;12347&apos;,1,&apos;0003&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1003&apos; ,&apos;赵四&apos;,&apos;1237&apos;,&apos;12348&apos;,1,&apos;0004&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1004&apos; ,&apos;武松&apos;,&apos;1238&apos;,&apos;12349&apos;,1,&apos;0005&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1005&apos; ,&apos;王五&apos;,&apos;1234&apos;,&apos;12345&apos;,1,&apos;0006&apos;);</span><br><span class="line">upsert into patient_test values( &apos;1006&apos; ,&apos;小明&apos;,&apos;1239&apos;,&apos;12350&apos;,1,&apos;0007&apos;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="SparkSql使用"><a href="#SparkSql使用" class="headerlink" title="SparkSql使用"></a>SparkSql使用</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> sparkConf = <span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local"</span>).setAppName(<span class="string">"empi-test"</span>)</span><br><span class="line"><span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(sparkConf)</span><br><span class="line"><span class="keyword">val</span> sqlContext = <span class="keyword">new</span> <span class="type">SQLContext</span>(sc)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> df = sqlContext.read</span><br><span class="line">  .format(<span class="string">"org.apache.phoenix.spark"</span>)</span><br><span class="line">  .option(<span class="string">"table"</span>, <span class="string">"patient_test"</span>)</span><br><span class="line">  .option(<span class="string">"zkUrl"</span>, <span class="string">"cdh01:2181"</span>)</span><br><span class="line">  .load()</span><br><span class="line">df.show()</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+----+----+---------+-----+---+-----------+</span><br><span class="line">|  ID|NAME|ID_NUMBER|PHONE|SEX|FILE_NUMBER|</span><br><span class="line">+----+----+---------+-----+---+-----------+</span><br><span class="line">|1000|  王五|     1234|12345|  1|       0001|</span><br><span class="line">|1001|  李四|     1235|12346|  1|       0002|</span><br><span class="line">|1002|  张三|     1236|12347|  1|       0003|</span><br><span class="line">|1003|  赵四|     1237|12348|  1|       0004|</span><br><span class="line">|1004|  王五|     1238|12345|  1|       0006|</span><br><span class="line">+----+----+---------+-----+---+-----------+</span><br></pre></td></tr></table></figure>
+
+<h3 id="说明-1"><a href="#说明-1" class="headerlink" title="$说明"></a>$说明</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> updatedDf = df.withColumn(<span class="string">"EMPI"</span>, empi(df(<span class="string">"ID"</span>)))</span><br></pre></td></tr></table></figure>
+
+<p>也可以写成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val updatedDf = df.withColumn(&quot;EMPI&quot;, empi($&quot;ID&quot;))</span><br></pre></td></tr></table></figure>
+
+<p>不过要用<code>$</code> ，需要在使用之前引用以下语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import sqlContext.implicits._</span><br></pre></td></tr></table></figure>
+
+<h3 id="show"><a href="#show" class="headerlink" title="show"></a>show</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.show(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+----+----+---------+-----+---+-----------+</span><br><span class="line">|  ID|NAME|ID_NUMBER|PHONE|SEX|FILE_NUMBER|</span><br><span class="line">+----+----+---------+-----+---+-----------+</span><br><span class="line">|1000|  王五|     1234|12345|  1|       0001|</span><br><span class="line">+----+----+---------+-----+---+-----------+</span><br><span class="line">only showing top 1 row</span><br></pre></td></tr></table></figure>
+
+<h3 id="select"><a href="#select" class="headerlink" title="select"></a>select</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.select(<span class="string">"FILE_NUMBER"</span>).show()</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-----------+</span><br><span class="line">|FILE_NUMBER|</span><br><span class="line">+-----------+</span><br><span class="line">|       0001|</span><br><span class="line">|       0002|</span><br><span class="line">|       0003|</span><br><span class="line">|       0004|</span><br><span class="line">|       0006|</span><br><span class="line">+-----------+</span><br></pre></td></tr></table></figure>
+
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.map(t =&gt; <span class="string">"NAME: "</span> + t.getAs[<span class="type">String</span>](<span class="string">"NAME"</span>)).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NAME: 王五</span><br><span class="line">NAME: 李四</span><br><span class="line">NAME: 张三</span><br><span class="line">NAME: 赵四</span><br><span class="line">NAME: 王五</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"ID"</span>, <span class="string">"NAME"</span>))).collect().foreach(println)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Map(ID -&gt; 1000, NAME -&gt; 王五)</span><br><span class="line">Map(ID -&gt; 1001, NAME -&gt; 李四)</span><br><span class="line">Map(ID -&gt; 1002, NAME -&gt; 张三)</span><br><span class="line">Map(ID -&gt; 1003, NAME -&gt; 赵四)</span><br><span class="line">Map(ID -&gt; 1004, NAME -&gt; 王五)</span><br></pre></td></tr></table></figure>
+
+<h3 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h3><p>排除为空的 <code>ID_NUMBER</code></p>
+<p>用 <code>!==</code> <code>===</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val idNumberNotNullList = df.filter($&quot;EMPI&quot;.isNotNull.and(df(columnName).isNotNull))</span><br></pre></td></tr></table></figure>
+
+<h3 id="groupBy"><a href="#groupBy" class="headerlink" title="groupBy"></a>groupBy</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">columnsDf.groupBy(columnNoIdListBuffer:_*).count().show()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//排除为空的身份证的人，找出所有身份证和ID，并按身份证分组</span></span><br><span class="line"><span class="keyword">val</span> idIdNumbers = df.filter(df(<span class="string">"ID_NUMBER"</span>) &gt; <span class="number">0</span>).map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"ID"</span>, <span class="string">"ID_NUMBER"</span>))).groupBy(_.get(<span class="string">"ID_NUMBER"</span>)).collect()</span><br><span class="line"><span class="comment">//按 ID_NUMBER分组</span></span><br><span class="line">idIdNumbers.foreach(println)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(Some(1236),CompactBuffer(Map(ID -&gt; 1002, ID_NUMBER -&gt; 1236)))</span><br><span class="line">(Some(1238),CompactBuffer(Map(ID -&gt; 1004, ID_NUMBER -&gt; 1238)))</span><br><span class="line">(Some(1234),CompactBuffer(Map(ID -&gt; 1000, ID_NUMBER -&gt; 1234), Map(ID -&gt; 1005, ID_NUMBER -&gt; 1234)))</span><br><span class="line">(Some(1235),CompactBuffer(Map(ID -&gt; 1001, ID_NUMBER -&gt; 1235)))</span><br><span class="line">(Some(1237),CompactBuffer(Map(ID -&gt; 1003, ID_NUMBER -&gt; 1237)))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//排除为空的身份证的人，找出所有身份证和ID，并按身份证分组</span></span><br><span class="line"><span class="keyword">val</span> idIdNumbers = df.filter(df(<span class="string">"ID_NUMBER"</span>) &gt; <span class="number">0</span>).map(_.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"ID"</span>, <span class="string">"ID_NUMBER"</span>))).groupBy(_.get(<span class="string">"ID_NUMBER"</span>)).collect()</span><br><span class="line"><span class="comment">//按 ID_NUMBER分组</span></span><br><span class="line">idIdNumbers.foreach(e=&gt;&#123;</span><br><span class="line">  println(e._1)</span><br><span class="line">  e._2.foreach(println)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Some(1236)</span><br><span class="line">Map(ID -&gt; 1002, ID_NUMBER -&gt; 1236)</span><br><span class="line">Some(1238)</span><br><span class="line">Map(ID -&gt; 1004, ID_NUMBER -&gt; 1238)</span><br><span class="line">Some(1234)</span><br><span class="line">Map(ID -&gt; 1000, ID_NUMBER -&gt; 1234)</span><br><span class="line">Map(ID -&gt; 1005, ID_NUMBER -&gt; 1234)</span><br><span class="line">Some(1235)</span><br><span class="line">Map(ID -&gt; 1001, ID_NUMBER -&gt; 1235)</span><br><span class="line">Some(1237)</span><br><span class="line">Map(ID -&gt; 1003, ID_NUMBER -&gt; 1237)</span><br></pre></td></tr></table></figure>
+
+<h3 id="合并字段"><a href="#合并字段" class="headerlink" title="合并字段"></a>合并字段</h3><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">columnsNotNullDf.select($<span class="string">"ID"</span>,concat($<span class="string">"ID_NUMBER"</span>,$<span class="string">"SEX"</span>)).show()</span><br></pre></td></tr></table></figure>
+
+<h2 id="null值替换"><a href="#null值替换" class="headerlink" title="null值替换"></a>null值替换</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.na.fill(<span class="string">""</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改值说明"><a href="#修改值说明" class="headerlink" title="修改值说明"></a>修改值说明</h3><p>需要用新的 <code>Dataframe</code> </p>
+<h2 id="一些说明"><a href="#一些说明" class="headerlink" title="一些说明"></a>一些说明</h2><p>要用 $</p>
+<p>要引用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// this is used to implicitly convert an RDD to a DataFrame.</span><br><span class="line">import sqlContext.implicits._</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Spark/" rel="tag"># Spark</a>
+            
+              <a href="/tags/Dataframe/" rel="tag"># Dataframe</a>
+            
+              <a href="/tags/scala/" rel="tag"># scala</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/31/Phoenix-一些笔记/" rel="next" title="Phoenix-一些笔记">
+                  <i class="fa fa-chevron-left"></i> Phoenix-一些笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/04/Spark2-笔记一/" rel="prev" title="Spark2-笔记一">
+                  Spark2-笔记一 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试表"><span class="nav-number">2.</span> <span class="nav-text">测试表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SparkSql使用"><span class="nav-number">3.</span> <span class="nav-text">SparkSql使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#说明-1"><span class="nav-number">3.1.</span> <span class="nav-text">$说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#show"><span class="nav-number">3.2.</span> <span class="nav-text">show</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#select"><span class="nav-number">3.3.</span> <span class="nav-text">select</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">3.4.</span> <span class="nav-text">map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#filter"><span class="nav-number">3.5.</span> <span class="nav-text">filter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#groupBy"><span class="nav-number">3.6.</span> <span class="nav-text">groupBy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#合并字段"><span class="nav-number">3.7.</span> <span class="nav-text">合并字段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#null值替换"><span class="nav-number">4.</span> <span class="nav-text">null值替换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改值说明"><span class="nav-number">4.1.</span> <span class="nav-text">修改值说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些说明"><span class="nav-number">5.</span> <span class="nav-text">一些说明</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: 'deb59ab2cde21b96eb8b7d7ab42e28a3',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

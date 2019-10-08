@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="开窗函数Oracle从8.1.6开始提供分析函数，分析函数用于计算基于组的某种聚合值，它和聚合函数的不同之处是：对于每个组返回多行，而聚合函数对于每个组只返回一行。 开窗函数指定了分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变化而变化">
+<meta name="keywords" content="oracle,over(partition by)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle-分析函数over使用">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/10/04/oracle-分析函数over使用/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="开窗函数Oracle从8.1.6开始提供分析函数，分析函数用于计算基于组的某种聚合值，它和聚合函数的不同之处是：对于每个组返回多行，而聚合函数对于每个组只返回一行。 开窗函数指定了分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变化而变化">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-08T01:08:53.475Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="oracle-分析函数over使用">
+<meta name="twitter:description" content="开窗函数Oracle从8.1.6开始提供分析函数，分析函数用于计算基于组的某种聚合值，它和聚合函数的不同之处是：对于每个组返回多行，而聚合函数对于每个组只返回一行。 开窗函数指定了分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变化而变化">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/10/04/oracle-分析函数over使用/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>oracle-分析函数over使用 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/10/04/oracle-分析函数over使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">oracle-分析函数over使用
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-04 19:29:09" itemprop="dateCreated datePublished" datetime="2019-10-04T19:29:09+08:00">2019-10-04</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-08 09:08:53" itemprop="dateModified" datetime="2019-10-08T09:08:53+08:00">2019-10-08</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="开窗函数"><a href="#开窗函数" class="headerlink" title="开窗函数"></a>开窗函数</h2><p>Oracle从8.1.6开始提供分析函数，分析函数用于计算基于组的某种聚合值，它和聚合函数的不同之处是：对于每个组返回多行，而聚合函数对于每个组只返回一行。</p>
+<p>开窗函数指定了分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变化而变化</p>
+<a id="more"></a>
+
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>over（order by salary） 按照salary排序进行累计，order by是个默认的开窗函数<br>over（partition by deptno）按照部门分区<br>over（partition by deptno order by salary）</p>
+<h3 id="开窗的窗口范围"><a href="#开窗的窗口范围" class="headerlink" title="开窗的窗口范围"></a>开窗的窗口范围</h3><p><code>over(order by salary range between 5 preceding and 5 following)</code>：窗口范围为当前行数据幅度减5加5后的范围内的。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--sum(s)over(order by s range between 2 preceding and 2 following) 表示加2或2的范围内的求和</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,<span class="keyword">sum</span>(s)<span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">range</span> <span class="keyword">between</span> <span class="number">2</span> <span class="keyword">preceding</span> <span class="keyword">and</span> <span class="number">2</span> <span class="keyword">following</span>) mm <span class="keyword">from</span> t2</span><br><span class="line">adf        <span class="number">3</span>        <span class="number">45</span>        <span class="number">45</span>  <span class="comment">--45加2减2即43到47，但是s在这个范围内只有45</span></span><br><span class="line">asdf       <span class="number">3</span>        <span class="number">55</span>        <span class="number">55</span></span><br><span class="line">cfe        <span class="number">2</span>        <span class="number">74</span>        <span class="number">74</span></span><br><span class="line"><span class="number">3</span>dd        <span class="number">3</span>        <span class="number">78</span>        <span class="number">158</span> <span class="comment">--78在76到80范围内有78，80，求和得158</span></span><br><span class="line">fda        <span class="number">1</span>        <span class="number">80</span>        <span class="number">158</span></span><br><span class="line">gds        <span class="number">2</span>        <span class="number">92</span>        <span class="number">92</span></span><br><span class="line">ffd        <span class="number">1</span>        <span class="number">95</span>        <span class="number">190</span></span><br><span class="line">dss        <span class="number">1</span>        <span class="number">95</span>        <span class="number">190</span></span><br><span class="line">ddd        <span class="number">3</span>        <span class="number">99</span>        <span class="number">198</span></span><br><span class="line">gf         <span class="number">3</span>        <span class="number">99</span>        <span class="number">198</span></span><br></pre></td></tr></table></figure>
+
+<p><code>over(order by salary rows between 5 preceding and 5 following)</code> ：窗口范围为当前行前后各移动5行。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--sum(s)over(order by s rows between 2 preceding and 2 following)表示在上下两行之间的范围内</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s, <span class="keyword">sum</span>(s)<span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">rows</span> <span class="keyword">between</span> <span class="number">2</span> <span class="keyword">preceding</span> <span class="keyword">and</span> <span class="number">2</span> <span class="keyword">following</span>) mm <span class="keyword">from</span> t2</span><br><span class="line">adf        <span class="number">3</span>        <span class="number">45</span>        <span class="number">174</span>  （<span class="number">45</span>+<span class="number">55</span>+<span class="number">74</span>=<span class="number">174</span>）</span><br><span class="line">asdf       <span class="number">3</span>        <span class="number">55</span>        <span class="number">252</span>   （<span class="number">45</span>+<span class="number">55</span>+<span class="number">74</span>+<span class="number">78</span>=<span class="number">252</span>）</span><br><span class="line">cfe        <span class="number">2</span>        <span class="number">74</span>        <span class="number">332</span>    （<span class="number">74</span>+<span class="number">55</span>+<span class="number">45</span>+<span class="number">78</span>+<span class="number">80</span>=<span class="number">332</span>）</span><br><span class="line"><span class="number">3</span>dd        <span class="number">3</span>        <span class="number">78</span>        <span class="number">379</span>    （<span class="number">78</span>+<span class="number">74</span>+<span class="number">55</span>+<span class="number">80</span>+<span class="number">92</span>=<span class="number">379</span>）</span><br><span class="line">fda        <span class="number">1</span>        <span class="number">80</span>        <span class="number">419</span></span><br><span class="line">gds        <span class="number">2</span>        <span class="number">92</span>        <span class="number">440</span></span><br><span class="line">ffd        <span class="number">1</span>        <span class="number">95</span>        <span class="number">461</span></span><br><span class="line">dss        <span class="number">1</span>        <span class="number">95</span>        <span class="number">480</span></span><br><span class="line">ddd        <span class="number">3</span>        <span class="number">99</span>        <span class="number">388</span></span><br><span class="line">gf         <span class="number">3</span>        <span class="number">99</span>        <span class="number">293</span></span><br></pre></td></tr></table></figure>
+
+<p>over（order by salary range between unbounded preceding and unbounded following）或者<br>over（order by salary rows between unbounded preceding and unbounded following）：窗口不做限制</p>
+<h2 id="与over函数结合的几个函数介绍"><a href="#与over函数结合的几个函数介绍" class="headerlink" title="与over函数结合的几个函数介绍"></a>与over函数结合的几个函数介绍</h2><h3 id="row-number-over-、rank-over-和dense-rank-over-函数的使用"><a href="#row-number-over-、rank-over-和dense-rank-over-函数的使用" class="headerlink" title="row_number()over()、rank()over()和dense_rank()over()函数的使用"></a>row_number()over()、rank()over()和dense_rank()over()函数的使用</h3><p>下面以班级成绩表t2来说明其应用</p>
+<p>t2表信息如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">cfe        2        74</span><br><span class="line">dss        1        95</span><br><span class="line">ffd        1        95</span><br><span class="line">fda        1        80</span><br><span class="line">gds        2        92</span><br><span class="line">gf         3        99</span><br><span class="line">ddd        3        99</span><br><span class="line">adf        3        45</span><br><span class="line">asdf       3        55</span><br><span class="line">3dd        3        78</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span>                                                                     </span><br><span class="line">    (                                                                          </span><br><span class="line">    <span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,<span class="keyword">rank</span>()<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2</span><br><span class="line">    )                                                                          </span><br><span class="line">    <span class="keyword">where</span> mm=<span class="number">1</span>；</span><br></pre></td></tr></table></figure>
+
+<p>得到的结果是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dss        1        95        1</span><br><span class="line">ffd        1        95        1</span><br><span class="line">gds        2        92        1</span><br><span class="line">gf         3        99        1</span><br><span class="line">ddd        3        99        1</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<p>  1.在求第一名成绩的时候，不能用row_number()，因为如果同班有两个并列第一，row_number()只返回一个结果;</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span>                                                                     </span><br><span class="line">    (                                                                          </span><br><span class="line">    <span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,row_number()<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2</span><br><span class="line">    )                                                                          </span><br><span class="line">    <span class="keyword">where</span> mm=<span class="number">1</span>；</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1        95        1  --95有两名但是只显示一个</span><br><span class="line">2        92        1</span><br><span class="line">3        99        1 --99有两名但也只显示一个</span><br></pre></td></tr></table></figure>
+
+<p>2.rank()和dense_rank()可以将所有的都查找出来：</p>
+<p>如上可以看到采用rank可以将并列第一名的都查找出来；<br>rank()和dense_rank()区别：<br>–rank()是跳跃排序，有两个第二名时接下来就是第四名；</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,<span class="keyword">rank</span>()<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dss        1        95        1</span><br><span class="line">ffd        1        95        1</span><br><span class="line">fda        1        80        3 --直接就跳到了第三</span><br><span class="line">gds        2        92        1</span><br><span class="line">cfe        2        74        2</span><br><span class="line">gf         3        99        1</span><br><span class="line">ddd        3        99        1</span><br><span class="line">3dd        3        78        3</span><br><span class="line">asdf       3        55        4</span><br><span class="line">adf        3        45        5</span><br></pre></td></tr></table></figure>
+
+<p>–dense_rank()l是连续排序，有两个第二名时仍然跟着第三名</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,<span class="keyword">dense_rank</span>()<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dss        1        95        1</span><br><span class="line">ffd        1        95        1</span><br><span class="line">fda        1        80        2 --连续排序（仍为2）</span><br><span class="line">gds        2        92        1</span><br><span class="line">cfe        2        74        2</span><br><span class="line">gf         3        99        1</span><br><span class="line">ddd        3        99        1</span><br><span class="line">3dd        3        78        2</span><br><span class="line">asdf       3        55        3</span><br><span class="line">adf        3        45        4</span><br></pre></td></tr></table></figure>
+
+<h3 id="sum-over-的使用"><a href="#sum-over-的使用" class="headerlink" title="sum() over()的使用"></a>sum() over()的使用</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s, <span class="keyword">sum</span>(s)<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2 <span class="comment">--根据班级进行分数求和</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">dss        1        95        190  --由于两个95都是第一名，所以累加时是两个第一名的相加</span><br><span class="line">ffd        1        95        190</span><br><span class="line">fda        1        80        270  --第一名加上第二名的</span><br><span class="line">gds        2        92        92</span><br><span class="line">cfe        2        74        166</span><br><span class="line">gf         3        99        198</span><br><span class="line">ddd        3        99        198</span><br><span class="line">3dd        3        78        276</span><br><span class="line">asdf       3        55        331</span><br><span class="line">adf        3        45        376</span><br></pre></td></tr></table></figure>
+
+<h3 id="first-value-over-和last-value-over-的使用"><a href="#first-value-over-和last-value-over-的使用" class="headerlink" title="first_value() over()和last_value() over()的使用"></a>first_value() over()和last_value() over()的使用</h3><p>找出这三条电路每条电路的第一条记录类型和最后一条记录类型</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> opr_id,res_type,</span><br><span class="line">       <span class="keyword">first_value</span>(res_type) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> opr_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> res_type) <span class="keyword">low</span>,</span><br><span class="line">       <span class="keyword">last_value</span>(res_type) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> opr_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> res_type <span class="keyword">rows</span> <span class="keyword">BETWEEN</span> <span class="keyword">unbounded</span> <span class="keyword">preceding</span> <span class="keyword">AND</span> <span class="keyword">unbounded</span> <span class="keyword">following</span>) <span class="keyword">high</span></span><br><span class="line">  <span class="keyword">FROM</span> rm_circuit_route</span><br><span class="line"><span class="keyword">WHERE</span> opr_id <span class="keyword">IN</span> (<span class="string">'000100190000000000021311'</span>,<span class="string">'000100190000000000021355'</span>,<span class="string">'000100190000000000021339'</span>)</span><br><span class="line"> <span class="keyword">ORDER</span> <span class="keyword">BY</span> opr_id;</span><br></pre></td></tr></table></figure>
+
+<p>注：<em>rows BETWEEN unbounded preceding AND unbounded following</em> 的使用</p>
+<p>–取last_value时不使用 <em>rows BETWEEN unbounded preceding AND unbounded following</em> 的结果</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> opr_id,res_type,</span><br><span class="line">       <span class="keyword">first_value</span>(res_type) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> opr_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> res_type) <span class="keyword">low</span>,</span><br><span class="line">       <span class="keyword">last_value</span>(res_type) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> opr_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> res_type) <span class="keyword">high</span></span><br><span class="line">  <span class="keyword">FROM</span> rm_circuit_route</span><br><span class="line"> <span class="keyword">WHERE</span> opr_id <span class="keyword">IN</span> (<span class="string">'000100190000000000021311'</span>,<span class="string">'000100190000000000021355'</span>,<span class="string">'000100190000000000021339'</span>)</span><br><span class="line"> <span class="keyword">ORDER</span> <span class="keyword">BY</span> opr_id;</span><br></pre></td></tr></table></figure>
+
+<p><em>如果不使用rows BETWEEN unbounded preceding AND unbounded following，取出的last_value由于与res_type进行进行排列，因此取出的电路的最后一行记录的类型就不是按照电路的范围提取了，而是以res_type为范围进行提取了。</em></p>
+<h4 id="在first-value和last-value中ignore-nulls的使用"><a href="#在first-value和last-value中ignore-nulls的使用" class="headerlink" title="在first_value和last_value中ignore nulls的使用"></a>在first_value和last_value中ignore nulls的使用</h4><p>取出该电路的第一条记录，加上<strong>ignore nulls</strong>后，如果第一条是判断的那个字段是空的，则默认取下一条，结果如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> opr_id, frist_value(route_name <span class="keyword">ignore</span> <span class="keyword">nulls</span>) <span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> opr_id)</span><br><span class="line"><span class="keyword">from</span> rm_circuit_route</span><br><span class="line"><span class="keyword">where</span> opr_id = <span class="string">'0000123'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="lag-over-函数用法（取出前n行数据）"><a href="#lag-over-函数用法（取出前n行数据）" class="headerlink" title="lag() over()函数用法（取出前n行数据）"></a>lag() over()函数用法（取出前n行数据）</h3><p><code>lag(expresstion,&lt;offset&gt;,&lt;default&gt;)</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span></span><br><span class="line">(<span class="keyword">select</span> <span class="number">1</span> <span class="keyword">id</span>,<span class="string">'a'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">2</span> <span class="keyword">id</span>,<span class="string">'b'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">3</span> <span class="keyword">id</span>,<span class="string">'c'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">4</span> <span class="keyword">id</span>,<span class="string">'d'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">5</span> <span class="keyword">id</span>,<span class="string">'e'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line">)</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">id</span>,<span class="keyword">name</span>,lag(<span class="keyword">id</span>,<span class="number">1</span>,<span class="string">''</span>)<span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">name</span>) <span class="keyword">from</span> a;</span><br></pre></td></tr></table></figure>
+
+<h3 id="lead-over-函数用法（取出后N行数据）"><a href="#lead-over-函数用法（取出后N行数据）" class="headerlink" title="lead() over()函数用法（取出后N行数据）"></a>lead() over()函数用法（取出后N行数据）</h3><p><code>lead(expresstion,&lt;offset&gt;,&lt;default&gt;)</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span></span><br><span class="line">(<span class="keyword">select</span> <span class="number">1</span> <span class="keyword">id</span>,<span class="string">'a'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">2</span> <span class="keyword">id</span>,<span class="string">'b'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">3</span> <span class="keyword">id</span>,<span class="string">'c'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">4</span> <span class="keyword">id</span>,<span class="string">'d'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line"> <span class="keyword">union</span></span><br><span class="line"> <span class="keyword">select</span> <span class="number">5</span> <span class="keyword">id</span>,<span class="string">'e'</span> <span class="keyword">name</span> <span class="keyword">from</span> dual</span><br><span class="line">)</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">id</span>,<span class="keyword">name</span>,<span class="keyword">lead</span>(<span class="keyword">id</span>,<span class="number">1</span>,<span class="string">''</span>)<span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">name</span>) <span class="keyword">from</span> a;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ratio-to-report-a-函数用法"><a href="#ratio-to-report-a-函数用法" class="headerlink" title="ratio_to_report(a)函数用法"></a>ratio_to_report(a)函数用法</h3><p><strong>Ratio_to_report() 括号中就是分子，over() 括号中就是分母</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span> (<span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span>  <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">2</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">3</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">5</span> a <span class="keyword">from</span> dual</span><br><span class="line">           )</span><br><span class="line"><span class="keyword">select</span> a, ratio_to_report(a)<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> a) b <span class="keyword">from</span> a</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> a;</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span> (<span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span>  <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">2</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">3</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">5</span> a <span class="keyword">from</span> dual</span><br><span class="line">           )</span><br><span class="line"><span class="keyword">select</span> a, ratio_to_report(a)<span class="keyword">over</span>() b <span class="keyword">from</span> a <span class="comment">--分母缺省就是整个占比</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> a;</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span> (<span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span>  <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">2</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">3</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">4</span> a <span class="keyword">from</span> dual</span><br><span class="line">           <span class="keyword">union</span> <span class="keyword">all</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">5</span> a <span class="keyword">from</span> dual</span><br><span class="line">           )</span><br><span class="line"><span class="keyword">select</span> a, ratio_to_report(a)<span class="keyword">over</span>() b <span class="keyword">from</span> a</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> a <span class="keyword">order</span> <span class="keyword">by</span> a;<span class="comment">--分组后的占比</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="percent-rank用法"><a href="#percent-rank用法" class="headerlink" title="percent_rank用法"></a>percent_rank用法</h3><p>计算方法：所在组排名序号-1除以该组所有的行数-1，如下所示自己计算的pr1与通过percent_rank函数得到的值是一样的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.deptno,</span><br><span class="line">       a.ename,</span><br><span class="line">       a.sal,</span><br><span class="line">       a.r,</span><br><span class="line">       b.n,</span><br><span class="line">       (a.r<span class="number">-1</span>)/(n<span class="number">-1</span>) pr1,</span><br><span class="line">       <span class="keyword">percent_rank</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> a.deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> a.sal) pr2</span><br><span class="line">  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> deptno,</span><br><span class="line">               ename,</span><br><span class="line">               sal,</span><br><span class="line">               <span class="keyword">rank</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) r <span class="comment">--计算出在组中的排名序号</span></span><br><span class="line">          <span class="keyword">FROM</span> emp</span><br><span class="line">         <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptno, sal) a,</span><br><span class="line">       (<span class="keyword">SELECT</span> deptno, <span class="keyword">COUNT</span>(<span class="number">1</span>) n <span class="keyword">FROM</span> emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno) b <span class="comment">--按部门计算每个部门的所有成员数</span></span><br><span class="line"> <span class="keyword">WHERE</span> a.deptno = b.deptno;</span><br></pre></td></tr></table></figure>
+
+<h3 id="cume-dist函数"><a href="#cume-dist函数" class="headerlink" title="cume_dist函数"></a>cume_dist函数</h3><p>计算方法：所在组排名序号除以该组所有的行数，但是如果存在并列情况，则需加上并列的个数-1，<br>如下所示自己计算的pr1与通过percent_rank函数得到的值是一样的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.deptno,</span><br><span class="line">       a.ename,</span><br><span class="line">       a.sal,</span><br><span class="line">       a.r,</span><br><span class="line">       b.n,</span><br><span class="line">       c.rn,</span><br><span class="line">       (a.r + c.rn - <span class="number">1</span>) / n pr1,</span><br><span class="line">       <span class="keyword">cume_dist</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> a.deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> a.sal) pr2</span><br><span class="line">  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> deptno,</span><br><span class="line">               ename,</span><br><span class="line">               sal,</span><br><span class="line">               <span class="keyword">rank</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) r</span><br><span class="line">          <span class="keyword">FROM</span> emp</span><br><span class="line">         <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptno, sal) a,</span><br><span class="line">       (<span class="keyword">SELECT</span> deptno, <span class="keyword">COUNT</span>(<span class="number">1</span>) n <span class="keyword">FROM</span> emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno) b,</span><br><span class="line">       (<span class="keyword">SELECT</span> deptno, r, <span class="keyword">COUNT</span>(<span class="number">1</span>) rn,sal</span><br><span class="line">          <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> deptno,sal,</span><br><span class="line">                       <span class="keyword">rank</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) r</span><br><span class="line">                  <span class="keyword">FROM</span> emp)</span><br><span class="line">         <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno, r,sal</span><br><span class="line">         <span class="keyword">ORDER</span> <span class="keyword">BY</span> deptno) c <span class="comment">--c表就是为了得到每个部门员工工资的一样的个数</span></span><br><span class="line"> <span class="keyword">WHERE</span> a.deptno = b.deptno</span><br><span class="line">   <span class="keyword">AND</span> a.deptno = c.deptno(+)</span><br><span class="line">   <span class="keyword">AND</span> a.sal = c.sal;</span><br></pre></td></tr></table></figure>
+
+<h3 id="percentile-cont函数"><a href="#percentile-cont函数" class="headerlink" title="percentile_cont函数"></a>percentile_cont函数</h3><p>含义：输入一个百分比（该百分比就是按照percent_rank函数计算的值），返回该百分比位置的平均值<br>如下，输入百分比为0.7，因为0.7介于0.6和0.8之间，因此返回的结果就是0.6对应的sal的1500加上0.8对应的sal的1600平均</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ename,</span><br><span class="line">       sal,</span><br><span class="line">       deptno,</span><br><span class="line">       <span class="keyword">percentile_cont</span>(<span class="number">0.7</span>) <span class="keyword">within</span> <span class="keyword">GROUP</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno) <span class="string">"Percentile_Cont"</span>,</span><br><span class="line">       <span class="keyword">percent_rank</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) <span class="string">"Percent_Rank"</span></span><br><span class="line">  <span class="keyword">FROM</span> emp</span><br><span class="line"> <span class="keyword">WHERE</span> deptno <span class="keyword">IN</span> (<span class="number">30</span>, <span class="number">60</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="PERCENTILE-DISC函数"><a href="#PERCENTILE-DISC函数" class="headerlink" title="PERCENTILE_DISC函数"></a>PERCENTILE_DISC函数</h3><p>功能描述：返回一个与输入的分布百分比值相对应的数据值，分布百分比的计算方法见函数CUME_DIST，如果没有正好对应的数据值，就取大于该分布值的下一个值。<br>注意：本函数与PERCENTILE_CONT的区别在找不到对应的分布值时返回的替代值的计算方法不同</p>
+<p>SAMPLE：下例中0.7的分布值在部门30中没有对应的Cume_Dist值，所以就取下一个分布值0.83333333所对应的SALARY来替代</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ename,</span><br><span class="line">       sal,</span><br><span class="line">       deptno,</span><br><span class="line">       <span class="keyword">percentile_disc</span>(<span class="number">0.7</span>) <span class="keyword">within</span> <span class="keyword">GROUP</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno) <span class="string">"Percentile_Disc"</span>,</span><br><span class="line">       <span class="keyword">cume_dist</span>() <span class="keyword">over</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> deptno <span class="keyword">ORDER</span> <span class="keyword">BY</span> sal) <span class="string">"Cume_Dist"</span></span><br><span class="line">  <span class="keyword">FROM</span> emp</span><br><span class="line"> <span class="keyword">WHERE</span> deptno <span class="keyword">IN</span> (<span class="number">30</span>, <span class="number">60</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><p>按 zjhm,xm 分组, ywscsj 降序，取第一条记录</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">select</span> aa.*</span><br><span class="line">  <span class="keyword">from</span> (<span class="keyword">select</span> t.*</span><br><span class="line">               ROW_NUMBER() <span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> t.zjhm, t.xm <span class="keyword">order</span> <span class="keyword">by</span> t.ywscsj <span class="keyword">desc</span>) <span class="keyword">as</span> g_id</span><br><span class="line">          <span class="keyword">from</span> hiop.tb_yl_patient_information t) aa</span><br><span class="line"> <span class="keyword">where</span> aa.g_id = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/lanzi/archive/2010/10/26/1861338.html" target="_blank" rel="noopener">OVER(PARTITION BY)函数用法</a></p>
+<p><a href="https://livesql.oracle.com/apex/livesql/file/content_FHXEW8QV9BNS5LUN2GTMYWWFL.html" target="_blank" rel="noopener">ROW_NUMBER(), RANK(), DENSE_RANK() WITH EXAMPLE</a></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+            
+              <a href="/tags/over-partition-by/" rel="tag"># over(partition by)</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/04/oracle-字符串处理笔记/" rel="next" title="oracle-字符串处理相关笔记">
+                  <i class="fa fa-chevron-left"></i> oracle-字符串处理相关笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/08/oracle-DBMS-JOB使用笔记/" rel="prev" title="oracle-DBMS_JOB使用笔记">
+                  oracle-DBMS_JOB使用笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开窗函数"><span class="nav-number">1.</span> <span class="nav-text">开窗函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">1.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开窗的窗口范围"><span class="nav-number">1.2.</span> <span class="nav-text">开窗的窗口范围</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与over函数结合的几个函数介绍"><span class="nav-number">2.</span> <span class="nav-text">与over函数结合的几个函数介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#row-number-over-、rank-over-和dense-rank-over-函数的使用"><span class="nav-number">2.1.</span> <span class="nav-text">row_number()over()、rank()over()和dense_rank()over()函数的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sum-over-的使用"><span class="nav-number">2.2.</span> <span class="nav-text">sum() over()的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#first-value-over-和last-value-over-的使用"><span class="nav-number">2.3.</span> <span class="nav-text">first_value() over()和last_value() over()的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#在first-value和last-value中ignore-nulls的使用"><span class="nav-number">2.3.1.</span> <span class="nav-text">在first_value和last_value中ignore nulls的使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lag-over-函数用法（取出前n行数据）"><span class="nav-number">2.4.</span> <span class="nav-text">lag() over()函数用法（取出前n行数据）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lead-over-函数用法（取出后N行数据）"><span class="nav-number">2.5.</span> <span class="nav-text">lead() over()函数用法（取出后N行数据）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ratio-to-report-a-函数用法"><span class="nav-number">2.6.</span> <span class="nav-text">ratio_to_report(a)函数用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#percent-rank用法"><span class="nav-number">2.7.</span> <span class="nav-text">percent_rank用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cume-dist函数"><span class="nav-number">2.8.</span> <span class="nav-text">cume_dist函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#percentile-cont函数"><span class="nav-number">2.9.</span> <span class="nav-text">percentile_cont函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PERCENTILE-DISC函数"><span class="nav-number">2.10.</span> <span class="nav-text">PERCENTILE_DISC函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">3.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: '79d204557c2454c1f2b4c0822b6bb133',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

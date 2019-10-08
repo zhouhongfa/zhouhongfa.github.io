@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="按照官方文档 sql-getting-started，学习Spark2的使用 https://spark.apache.org/docs/latest/sql-getting-started.html">
+<meta name="keywords" content="Spark2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark2-笔记二(Spark Sql 基础)">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/09/04/Spark2-笔记二/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="按照官方文档 sql-getting-started，学习Spark2的使用 https://spark.apache.org/docs/latest/sql-getting-started.html">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-05T06:30:26.933Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark2-笔记二(Spark Sql 基础)">
+<meta name="twitter:description" content="按照官方文档 sql-getting-started，学习Spark2的使用 https://spark.apache.org/docs/latest/sql-getting-started.html">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/09/04/Spark2-笔记二/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Spark2-笔记二(Spark Sql 基础) | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/09/04/Spark2-笔记二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Spark2-笔记二(Spark Sql 基础)
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-04 12:34:16" itemprop="dateCreated datePublished" datetime="2019-09-04T12:34:16+08:00">2019-09-04</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-05 14:30:26" itemprop="dateModified" datetime="2019-09-05T14:30:26+08:00">2019-09-05</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Spark2/" itemprop="url" rel="index"><span itemprop="name">Spark2</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>按照官方文档 <code>sql-getting-started</code>，学习Spark2的使用</p>
+<p><a href="https://spark.apache.org/docs/latest/sql-getting-started.html" target="_blank" rel="noopener">https://spark.apache.org/docs/latest/sql-getting-started.html</a></p>
+<a id="more"></a>
+
+<h2 id="创建-SprinSession"><a href="#创建-SprinSession" class="headerlink" title="创建 SprinSession"></a>创建 SprinSession</h2><p>创建 SprinSession</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">  .builder()</span><br><span class="line">  .appName(<span class="string">"Spark SQL basic example"</span>)</span><br><span class="line">  .config(<span class="string">"spark.some.config.option"</span>, <span class="string">"some-value"</span>)</span><br><span class="line">  .getOrCreate()</span><br><span class="line"></span><br><span class="line"><span class="comment">// For implicit conversions like converting RDDs to DataFrames</span></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建-DataFrames"><a href="#创建-DataFrames" class="headerlink" title="创建 DataFrames"></a>创建 DataFrames</h2><p>以以下json文件示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;name&quot;:&quot;Michael&quot;&#125;</span><br><span class="line">&#123;&quot;name&quot;:&quot;Andy&quot;, &quot;age&quot;:30&#125;</span><br><span class="line">&#123;&quot;name&quot;:&quot;Justin&quot;, &quot;age&quot;:19&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.apache.spark.examples.learn</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">Demo1</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">      .builder()</span><br><span class="line">      .appName(<span class="string">"spark- demo"</span>)</span><br><span class="line">      .config(<span class="string">"spark.master"</span>, <span class="string">"local"</span>)</span><br><span class="line">      .getOrCreate()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// For implicit conversions like converting RDDs to DataFrames</span></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line">    <span class="keyword">val</span> df = spark.read.json(<span class="string">"src/main/resources/people.json"</span>)</span><br><span class="line">    df.show()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.IllegalArgumentException: Illegal pattern component: XXX</span><br></pre></td></tr></table></figure>
+
+<p>commongs-lang3版本问题</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-lang3<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.8.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/codehaus/janino/InternalCompilerException</span><br></pre></td></tr></table></figure>
+
+<p>增加依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.codehaus.janino<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>janino<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.8<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>额，ok了，输出如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">+----+-------+</span><br><span class="line">| age|   name|</span><br><span class="line">+----+-------+</span><br><span class="line">|null|Michael|</span><br><span class="line">|  30|   Andy|</span><br><span class="line">|  19| Justin|</span><br><span class="line">+----+-------+</span><br></pre></td></tr></table></figure>
+
+<p>详细使用在 </p>
+<blockquote>
+<p> Find full example code at “examples/src/main/scala/org/apache/spark/examples/sql/SparkSQLExample.scala” in the Spark repo.</p>
+</blockquote>
+<h2 id="无类型数据集操作（又名DataFrame操作）"><a href="#无类型数据集操作（又名DataFrame操作）" class="headerlink" title="无类型数据集操作（又名DataFrame操作）"></a>无类型数据集操作（又名DataFrame操作）</h2><p>如上所述，在Spark 2.0中，DataFrames只是Scala和Java API中Rows的数据集。与“类型转换”相比，这些操作也称为“无类型转换”，带有强类型Scala / Java数据集。</p>
+<p>这里我们包括使用数据集进行结构化数据处理的一些基本示例：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// This import is needed to use the $-notation</span></span><br><span class="line"><span class="keyword">import</span> spark.implicits._</span><br><span class="line"><span class="comment">// Print the schema in a tree format</span></span><br><span class="line">df.printSchema()</span><br><span class="line"><span class="comment">// root</span></span><br><span class="line"><span class="comment">// |-- age: long (nullable = true)</span></span><br><span class="line"><span class="comment">// |-- name: string (nullable = true)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Select only the "name" column</span></span><br><span class="line">df.select(<span class="string">"name"</span>).show()</span><br><span class="line"><span class="comment">// +-------+</span></span><br><span class="line"><span class="comment">// |   name|</span></span><br><span class="line"><span class="comment">// +-------+</span></span><br><span class="line"><span class="comment">// |Michael|</span></span><br><span class="line"><span class="comment">// |   Andy|</span></span><br><span class="line"><span class="comment">// | Justin|</span></span><br><span class="line"><span class="comment">// +-------+</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Select everybody, but increment the age by 1</span></span><br><span class="line">df.select($<span class="string">"name"</span>, $<span class="string">"age"</span> + <span class="number">1</span>).show()</span><br><span class="line"><span class="comment">// +-------+---------+</span></span><br><span class="line"><span class="comment">// |   name|(age + 1)|</span></span><br><span class="line"><span class="comment">// +-------+---------+</span></span><br><span class="line"><span class="comment">// |Michael|     null|</span></span><br><span class="line"><span class="comment">// |   Andy|       31|</span></span><br><span class="line"><span class="comment">// | Justin|       20|</span></span><br><span class="line"><span class="comment">// +-------+---------+</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Select people older than 21</span></span><br><span class="line">df.filter($<span class="string">"age"</span> &gt; <span class="number">21</span>).show()</span><br><span class="line"><span class="comment">// +---+----+</span></span><br><span class="line"><span class="comment">// |age|name|</span></span><br><span class="line"><span class="comment">// +---+----+</span></span><br><span class="line"><span class="comment">// | 30|Andy|</span></span><br><span class="line"><span class="comment">// +---+----+</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Count people by age</span></span><br><span class="line">df.groupBy(<span class="string">"age"</span>).count().show()</span><br><span class="line"><span class="comment">// +----+-----+</span></span><br><span class="line"><span class="comment">// | age|count|</span></span><br><span class="line"><span class="comment">// +----+-----+</span></span><br><span class="line"><span class="comment">// |  19|    1|</span></span><br><span class="line"><span class="comment">// |null|    1|</span></span><br><span class="line"><span class="comment">// |  30|    1|</span></span><br><span class="line"><span class="comment">// +----+-----+</span></span><br></pre></td></tr></table></figure>
+
+<p>Find full example code at “examples/src/main/scala/org/apache/spark/examples/sql/SparkSQLExample.scala” in the Spark repo.</p>
+<h2 id="以编程方式运行SQL查询"><a href="#以编程方式运行SQL查询" class="headerlink" title="以编程方式运行SQL查询"></a>以编程方式运行SQL查询</h2><p>SparkSession上的sql函数使应用程序能够以编程方式运行SQL查询并将结果作为DataFrame返回。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Register the DataFrame as a SQL temporary view</span></span><br><span class="line">df.createOrReplaceTempView(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> sqlDF = spark.sql(<span class="string">"SELECT * FROM people"</span>)</span><br><span class="line">sqlDF.show()</span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// | age|   name|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// |null|Michael|</span></span><br><span class="line"><span class="comment">// |  30|   Andy|</span></span><br><span class="line"><span class="comment">// |  19| Justin|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="全局临时视图"><a href="#全局临时视图" class="headerlink" title="全局临时视图"></a>全局临时视图</h2><p>Spark SQL中的临时视图是会话范围的，如果创建它的会话终止，它将消失。如果您希望拥有一个在所有会话之间共享的临时视图并保持活动状态，直到Spark应用程序终止，您可以创建一个全局临时视图。全局临时视图与系统保留的数据库 <code>global_temp</code> 绑定，我们必须使用限定名称来引用它，例如 <code>SELECT * FROM global_temp.view1</code>。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Register the DataFrame as a global temporary view</span></span><br><span class="line">df.createGlobalTempView(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Global temporary view is tied to a system preserved database `global_temp`</span></span><br><span class="line">spark.sql(<span class="string">"SELECT * FROM global_temp.people"</span>).show()</span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// | age|   name|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// |null|Michael|</span></span><br><span class="line"><span class="comment">// |  30|   Andy|</span></span><br><span class="line"><span class="comment">// |  19| Justin|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Global temporary view is cross-session</span></span><br><span class="line">spark.newSession().sql(<span class="string">"SELECT * FROM global_temp.people"</span>).show()</span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// | age|   name|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// |null|Michael|</span></span><br><span class="line"><span class="comment">// |  30|   Andy|</span></span><br><span class="line"><span class="comment">// |  19| Justin|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br></pre></td></tr></table></figure>
+
+<p>Find full example code at “examples/src/main/scala/org/apache/spark/examples/sql/SparkSQLExample.scala” in the Spark repo.</p>
+<h2 id="创建数据集Dataset"><a href="#创建数据集Dataset" class="headerlink" title="创建数据集Dataset"></a>创建数据集Dataset</h2><p>数据集与RDD类似，但是，它们不使用Java序列化或Kryo，而是使用专用的编码器来序列化对象以便通过网络进行处理或传输。编码器和标准序列化都负责将对象转换为字节，编码器是动态生成的代码，它使用一种格式，允许Spark执行许多操作，如过滤，排序和散列，而无需将字节反序列化回对象。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Long</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">//</span> <span class="title">Encoders</span> <span class="title">are</span> <span class="title">created</span> <span class="title">for</span> <span class="title">case</span> <span class="title">classes</span></span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">caseClassDS</span> </span>= <span class="type">Seq</span>(<span class="type">Person</span>(<span class="string">"Andy"</span>, <span class="number">32</span>)).toDS()</span><br><span class="line">caseClassDS.show()</span><br><span class="line"><span class="comment">// +----+---+</span></span><br><span class="line"><span class="comment">// |name|age|</span></span><br><span class="line"><span class="comment">// +----+---+</span></span><br><span class="line"><span class="comment">// |Andy| 32|</span></span><br><span class="line"><span class="comment">// +----+---+</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Encoders for most common types are automatically provided by importing spark.implicits._</span></span><br><span class="line"><span class="keyword">val</span> primitiveDS = <span class="type">Seq</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>).toDS()</span><br><span class="line">primitiveDS.map(_ + <span class="number">1</span>).collect() <span class="comment">// Returns: Array(2, 3, 4)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// DataFrames can be converted to a Dataset by providing a class. Mapping will be done by name</span></span><br><span class="line"><span class="keyword">val</span> path = <span class="string">"examples/src/main/resources/people.json"</span></span><br><span class="line"><span class="keyword">val</span> peopleDS = spark.read.json(path).as[<span class="type">Person</span>]</span><br><span class="line">peopleDS.show()</span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// | age|   name|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br><span class="line"><span class="comment">// |null|Michael|</span></span><br><span class="line"><span class="comment">// |  30|   Andy|</span></span><br><span class="line"><span class="comment">// |  19| Justin|</span></span><br><span class="line"><span class="comment">// +----+-------+</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="与RDD进行转换"><a href="#与RDD进行转换" class="headerlink" title="与RDD进行转换"></a>与RDD进行转换</h2><p>Spark SQL支持两种不同的方法将现有RDD转换为数据集。第一种方法使用反射来推断包含特定类型对象的RDD的模式。这种基于反射的方法可以提供更简洁的代码，并且在您编写Spark应用程序时已经了解模式时可以很好地工作。</p>
+<p>创建数据集的第二种方法是通过编程接口，允许您构建模式，然后将其应用于现有RDD。虽然此方法更详细，但它允许您在直到运行时才知道列及其类型时构造数据集。</p>
+<h3 id="使用反射推断模式-schema"><a href="#使用反射推断模式-schema" class="headerlink" title="使用反射推断模式(schema)"></a>使用反射推断模式(schema)</h3><p>Spark SQL的Scala接口支持自动将包含RDD的案例类转换为DataFrame。case类定义了表的模式。使用反射读取case类的参数名称，并成为列的名称。案例类也可以嵌套或包含复杂类型，如Seqs或Arrays。此RDD可以隐式转换为DataFrame，然后注册为表。表可以在后续SQL语句中使用。</p>
+<p>people.txt内容如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Michael, 29</span><br><span class="line">Andy, 30</span><br><span class="line">Justin, 19</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples.sparksql</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.<span class="type">SparkSession</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Long</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">SparkSqlTest</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">    .builder()</span><br><span class="line">    .appName(<span class="string">"Spark SQL basic example"</span>)</span><br><span class="line">    .config(<span class="string">"spark.master"</span>, <span class="string">"local"</span>)</span><br><span class="line">    .getOrCreate()</span><br><span class="line">  <span class="keyword">val</span> sc = spark.sparkContext</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// For implicit conversions like converting RDDs to DataFrames</span></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line">    <span class="comment">// Create an RDD of Person objects from a text file, convert it to a Dataframe</span></span><br><span class="line">    <span class="keyword">val</span> peopleDF = sc.textFile(<span class="string">"src/main/resources/people.txt"</span>)</span><br><span class="line">      .map(_.split(<span class="string">","</span>))</span><br><span class="line">      .map(attributes=&gt;<span class="type">Person</span>(attributes(<span class="number">0</span>), attributes(<span class="number">1</span>).trim.toInt))</span><br><span class="line">      .toDF()</span><br><span class="line">    <span class="comment">//注册成临时视图</span></span><br><span class="line">    peopleDF.createOrReplaceTempView(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// SQL statements can be run by using the sql methods provided by Spark</span></span><br><span class="line">    <span class="keyword">val</span> teenagersDF = spark.sql(<span class="string">"SELECT name, age FROM people WHERE age BETWEEN 13 AND 19"</span>)</span><br><span class="line">    <span class="comment">// 结果中的行的列可以通过字段索引访问</span></span><br><span class="line">    teenagersDF.map(teenager =&gt; <span class="string">"Name: "</span> + teenager(<span class="number">0</span>)).show()</span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line">    <span class="comment">// |       value|</span></span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line">    <span class="comment">// |Name: Justin|</span></span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line">    <span class="comment">// 或者通过字段名</span></span><br><span class="line">    teenagersDF.map(teenager =&gt; <span class="string">"Name: "</span> + teenager.getAs[<span class="type">String</span>](<span class="string">"name"</span>)).show()</span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line">    <span class="comment">// |       value|</span></span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line">    <span class="comment">// |Name: Justin|</span></span><br><span class="line">    <span class="comment">// +------------+</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 对 Dataset[Map[K,V]]，无预定义的编码器, 需要显式声明</span></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">val</span> mapEncoder = org.apache.spark.sql.<span class="type">Encoders</span>.kryo[<span class="type">Map</span>[<span class="type">String</span>, <span class="type">Any</span>]]</span><br><span class="line">    <span class="comment">// Primitive types and case classes can be also defined as</span></span><br><span class="line">    <span class="comment">// implicit val stringIntMapEncoder: Encoder[Map[String, Any]] = ExpressionEncoder()</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// row.getValuesMap[T] 一次检索多个列到 Map[String, T]</span></span><br><span class="line">    teenagersDF.map(teenager =&gt; teenager.getValuesMap[<span class="type">Any</span>](<span class="type">List</span>(<span class="string">"name"</span>, <span class="string">"age"</span>))).collect()</span><br><span class="line">    <span class="comment">// Array(Map("name" -&gt; "Justin", "age" -&gt; 19))</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="以编程方式指定-schema"><a href="#以编程方式指定-schema" class="headerlink" title="以编程方式指定 schema"></a>以编程方式指定 schema</h3><p>如果无法提前定义案例类（例如，记录结构以字符串形式编码，或者文本数据集将被解析，字段将针对不同用户进行不同的投影），可以通过三个步骤以编程方式创建 <code>DataFrame</code>。</p>
+<ol>
+<li>从原始RDD创建行的RDD;</li>
+<li>创建由与步骤1中创建的RDD中的行结构匹配的 <code>StructType</code> 表示的模式。</li>
+<li>通过SparkSession提供的createDataFrame方法将模式应用于行的RDD。</li>
+</ol>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples.sparksql</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.&#123;<span class="type">Row</span>, <span class="type">SparkSession</span>&#125;</span><br><span class="line"><span class="keyword">import</span> org.apache.spark.sql.types._</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, age: <span class="type">Long</span></span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">object</span> <span class="title">SparkSqlTest</span> </span>&#123;</span><br><span class="line">  <span class="keyword">val</span> spark = <span class="type">SparkSession</span></span><br><span class="line">    .builder()</span><br><span class="line">    .appName(<span class="string">"Spark SQL basic example"</span>)</span><br><span class="line">    .config(<span class="string">"spark.master"</span>, <span class="string">"local"</span>)</span><br><span class="line">    .getOrCreate()</span><br><span class="line">  <span class="keyword">val</span> sc = spark.sparkContext</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// For implicit conversions like converting RDDs to DataFrames</span></span><br><span class="line">    <span class="keyword">import</span> spark.implicits._</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建 RDD</span></span><br><span class="line">    <span class="keyword">val</span> peopleRDD = sc.textFile(<span class="string">"src/main/resources/people.txt"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//用字符串编码</span></span><br><span class="line">    <span class="keyword">val</span> schemaString = <span class="string">"name age"</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据schema字符串创建schema</span></span><br><span class="line">    <span class="keyword">val</span> fields = schemaString.split(<span class="string">" "</span>)</span><br><span class="line">      .map(fieldName =&gt; <span class="type">StructField</span>(fieldName, <span class="type">StringType</span>, nullable = <span class="literal">true</span>))</span><br><span class="line">    <span class="keyword">val</span> schema = <span class="type">StructType</span>(fields)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//转换 RDD(people) 成 Rows</span></span><br><span class="line">    <span class="keyword">val</span> rowRDD = peopleRDD</span><br><span class="line">      .map(_.split(<span class="string">","</span>))</span><br><span class="line">      .map(attributes=&gt;<span class="type">Row</span>(attributes(<span class="number">0</span>), attributes(<span class="number">1</span>).trim))</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将schema应用到 RDD</span></span><br><span class="line">    <span class="keyword">val</span> peopleDF = spark.createDataFrame(rowRDD, schema)</span><br><span class="line"></span><br><span class="line">    <span class="comment">//使用 DataFrame 创建临时视图</span></span><br><span class="line">    peopleDF.createOrReplaceTempView(<span class="string">"people"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// SQL can be run over a temporary view created using DataFrames</span></span><br><span class="line">    <span class="keyword">val</span> results = spark.sql(<span class="string">"SELECT name FROM people"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// The results of SQL queries are DataFrames and support all the normal RDD operations</span></span><br><span class="line">    <span class="comment">// The columns of a row in the result can be accessed by field index or by field name</span></span><br><span class="line">    results.map(attributes =&gt; <span class="string">"Name: "</span> + attributes(<span class="number">0</span>)).show()</span><br><span class="line">    <span class="comment">// +-------------+</span></span><br><span class="line">    <span class="comment">// |        value|</span></span><br><span class="line">    <span class="comment">// +-------------+</span></span><br><span class="line">    <span class="comment">// |Name: Michael|</span></span><br><span class="line">    <span class="comment">// |   Name: Andy|</span></span><br><span class="line">    <span class="comment">// | Name: Justin|</span></span><br><span class="line">    <span class="comment">// +-------------+</span></span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h2><p>内置的DataFrames函数提供常见的聚合，例如<code>count()</code>, <code>countDistinct()</code>, <code>avg()</code>, <code>max()</code>, <code>min()</code>, etc. 虽然这些函数是为DataFrames设计的，但Spark SQL还为Scala和Java中的某些函数提供了类型安全版本，以便使用强类型数据集。此外，用户不限于预定义的聚合函数，并且可以创建自己的聚合函数。</p>
+<h3 id="用户定义的无类型聚合函数"><a href="#用户定义的无类型聚合函数" class="headerlink" title="用户定义的无类型聚合函数"></a>用户定义的无类型聚合函数</h3><p>用户必须扩展UserDefinedAggregateFunction抽象类以实现自定义无类型聚合函数。例如，用户定义的平均值可能如下所示：</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Spark2/" rel="tag"># Spark2</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/04/Spark2-笔记一/" rel="next" title="Spark2-笔记一">
+                  <i class="fa fa-chevron-left"></i> Spark2-笔记一
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/06/Maven-shade化解决依赖冲突/" rel="prev" title="Maven-shade化解决依赖冲突">
+                  Maven-shade化解决依赖冲突 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-SprinSession"><span class="nav-number">1.</span> <span class="nav-text">创建 SprinSession</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建-DataFrames"><span class="nav-number">2.</span> <span class="nav-text">创建 DataFrames</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无类型数据集操作（又名DataFrame操作）"><span class="nav-number">3.</span> <span class="nav-text">无类型数据集操作（又名DataFrame操作）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以编程方式运行SQL查询"><span class="nav-number">4.</span> <span class="nav-text">以编程方式运行SQL查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局临时视图"><span class="nav-number">5.</span> <span class="nav-text">全局临时视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建数据集Dataset"><span class="nav-number">6.</span> <span class="nav-text">创建数据集Dataset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与RDD进行转换"><span class="nav-number">7.</span> <span class="nav-text">与RDD进行转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用反射推断模式-schema"><span class="nav-number">7.1.</span> <span class="nav-text">使用反射推断模式(schema)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以编程方式指定-schema"><span class="nav-number">7.2.</span> <span class="nav-text">以编程方式指定 schema</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#聚合"><span class="nav-number">8.</span> <span class="nav-text">聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户定义的无类型聚合函数"><span class="nav-number">8.1.</span> <span class="nav-text">用户定义的无类型聚合函数</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: '852aafd03615417edde81bb395c76a39',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

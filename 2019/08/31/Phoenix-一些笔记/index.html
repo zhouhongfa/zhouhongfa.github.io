@@ -62,7 +62,7 @@
 <meta property="og:site_name" content="zhouhongfa&#39;s Blog">
 <meta property="og:description" content="sqlline.py使用连接1./sqlline.py localhost  常用命令显示所有表 !tables">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-31T10:46:34.032Z">
+<meta property="og:updated_time" content="2019-09-16T09:11:23.951Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Phoenix-一些笔记">
 <meta name="twitter:description" content="sqlline.py使用连接1./sqlline.py localhost  常用命令显示所有表 !tables">
@@ -283,11 +283,19 @@
                 
               
 
-              <time title="创建时间：2019-08-31 14:57:24 / 修改时间：18:46:34" itemprop="dateCreated datePublished" datetime="2019-08-31T14:57:24+08:00">2019-08-31</time>
+              <time title="创建时间：2019-08-31 14:57:24" itemprop="dateCreated datePublished" datetime="2019-08-31T14:57:24+08:00">2019-08-31</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-16 17:11:23" itemprop="dateModified" datetime="2019-09-16T17:11:23+08:00">2019-09-16</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -329,6 +337,30 @@
 <p><code>!help</code></p>
 <h2 id="建表语句"><a href="#建表语句" class="headerlink" title="建表语句"></a>建表语句</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> userinfo_c(<span class="keyword">id</span> <span class="built_in">varchar</span> primary <span class="keyword">key</span>,<span class="keyword">name</span> <span class="built_in">varchar</span>);</span><br></pre></td></tr></table></figure>
 
+<h2 id="与Hbase关联"><a href="#与Hbase关联" class="headerlink" title="与Hbase关联"></a>与Hbase关联</h2><p>先到 Hbase建表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create &apos;patient_test&apos;,&apos;info&apos;</span><br></pre></td></tr></table></figure>
+
+<p>再创建phoenix表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create table &quot;patient_test&quot;(&quot;id&quot; varchar primary key,&quot;info&quot;.&quot;name&quot; varchar, &quot;info&quot;.&quot;id_number&quot; varchar, &quot;info&quot;.&quot;phone&quot; varchar, &quot;info&quot;.&quot;sex&quot; varchar, &quot;info&quot;.&quot;file_number&quot; varchar, &quot;info&quot;.&quot;empi&quot; varchar);</span><br></pre></td></tr></table></figure>
+
+<p>注意要用 双引号括起来所有的字段和表名，不然关联不了</p>
+<p>在 phoenix 上插入一条数据 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0: jdbc:phoenix:&gt; upsert into &quot;patient_test&quot; values( &apos;1000&apos; ,&apos;王五&apos;,&apos;1234&apos;,&apos;12345&apos;,&apos;1&apos;,&apos;0001&apos;,&apos;&apos;);</span><br><span class="line">1 row affected (0.097 seconds)</span><br></pre></td></tr></table></figure>
+
+<p>到 hbase上查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hbase(main):009:0&gt; scan &apos;patient_test&apos;</span><br><span class="line">ROW                                            COLUMN+CELL                                                                                                                            </span><br><span class="line"> 1000                                          column=info:_0, timestamp=1567564026903, value=x                                                                                       </span><br><span class="line"> 1000                                          column=info:file_number, timestamp=1567564026903, value=0001                                                                           </span><br><span class="line"> 1000                                          column=info:id_number, timestamp=1567564026903, value=1234                                                                             </span><br><span class="line"> 1000                                          column=info:name, timestamp=1567564026903, value=\xE7\x8E\x8B\xE4\xBA\x94                                                              </span><br><span class="line"> 1000                                          column=info:phone, timestamp=1567564026903, value=12345                                                                                </span><br><span class="line"> 1000                                          column=info:sex, timestamp=1567564026903, value=\x80\x00\x00\x00\x00\x00\x00\x01</span><br></pre></td></tr></table></figure>
+
+<p>Hbase </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">put &apos;patient_test&apos;, &apos;1000&apos;,&apos;info:sex&apos;,1</span><br></pre></td></tr></table></figure>
+
+<p>bigint 类型字段会存在 hbase 插入的数据 phoneix读取不了，phoenix插入的数据 hbase读取不正常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0: jdbc:phoenix:&gt; select * from &quot;patient_test&quot;;</span><br><span class="line">Error: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6 (state=22000,code=201)</span><br><span class="line">java.sql.SQLException: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6</span><br></pre></td></tr></table></figure>
+
+<p>所以最好所有都用 varchar 存</p>
+<h2 id="修改表字段"><a href="#修改表字段" class="headerlink" title="修改表字段"></a>修改表字段</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_schema.my_table <span class="keyword">ADD</span> d.dept_id <span class="built_in">char</span>(<span class="number">10</span>) <span class="keyword">VERSIONS</span>=<span class="number">10</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_table <span class="keyword">ADD</span> dept_name <span class="built_in">char</span>(<span class="number">50</span>), parent_id <span class="built_in">char</span>(<span class="number">15</span>) <span class="literal">null</span> primary <span class="keyword">key</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_table <span class="keyword">DROP</span> <span class="keyword">COLUMN</span> d.dept_id, parent_id;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">VIEW</span> my_view <span class="keyword">DROP</span> <span class="keyword">COLUMN</span> new_col;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> my_table <span class="keyword">SET</span> IMMUTABLE_ROWS=<span class="literal">true</span>,DISABLE_WAL=<span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">"gzhonghui"</span>.<span class="string">"patient_basic_information"</span> <span class="keyword">ADD</span> <span class="string">"empi"</span> <span class="built_in">varchar</span>;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> <span class="string">"gzhonghui"</span>.<span class="string">"patient_basic_information"</span> <span class="keyword">DROP</span> <span class="string">"empi"</span>;</span><br></pre></td></tr></table></figure>
+
 
     </div>
 
@@ -363,6 +395,10 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/02/Spark-Dataframe笔记/" rel="prev" title="Spark-Dataframe笔记一">
+                  Spark-Dataframe笔记一 <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -414,7 +450,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlline-py使用"><span class="nav-number">1.</span> <span class="nav-text">sqlline.py使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#连接"><span class="nav-number">1.1.</span> <span class="nav-text">连接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用命令"><span class="nav-number">2.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建表语句"><span class="nav-number">3.</span> <span class="nav-text">建表语句</span></a></li></ol></div>
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlline-py使用"><span class="nav-number">1.</span> <span class="nav-text">sqlline.py使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#连接"><span class="nav-number">1.1.</span> <span class="nav-text">连接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用命令"><span class="nav-number">2.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建表语句"><span class="nav-number">3.</span> <span class="nav-text">建表语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与Hbase关联"><span class="nav-number">4.</span> <span class="nav-text">与Hbase关联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改表字段"><span class="nav-number">5.</span> <span class="nav-text">修改表字段</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -433,7 +469,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -466,7 +502,23 @@
         
           
         
-        <span class="site-state-item-count">9</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -539,7 +591,55 @@
         
           
         
-        <span class="site-state-item-count">29</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

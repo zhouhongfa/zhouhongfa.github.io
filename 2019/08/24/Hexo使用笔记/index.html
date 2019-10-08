@@ -63,7 +63,7 @@
 <meta property="og:description" content="说明记录一下搭建 hexo 博客中的一些笔记">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://zhouhongfa.github.io/2019/08/24/Hexo使用笔记/1566784011692.png">
-<meta property="og:updated_time" content="2019-08-29T07:27:54.677Z">
+<meta property="og:updated_time" content="2019-10-08T01:22:18.939Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo使用笔记">
 <meta name="twitter:description" content="说明记录一下搭建 hexo 博客中的一些笔记">
@@ -296,9 +296,22 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-08-29 15:27:54" itemprop="dateModified" datetime="2019-08-29T15:27:54+08:00">2019-08-29</time>
+                <time title="修改时间：2019-10-08 09:22:18" itemprop="dateModified" datetime="2019-10-08T09:22:18+08:00">2019-10-08</time>
               </span>
             
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/hexo/" itemprop="url" rel="index"><span itemprop="name">hexo</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -424,6 +437,19 @@
 <h2 id="引用其他文章"><a href="#引用其他文章" class="headerlink" title="引用其他文章"></a>引用其他文章</h2><p>举例 引用 <code>Hello.md</code></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% post_link Hello %&#125;</span><br></pre></td></tr></table></figure>
 
+<h2 id="hexo-常用命令"><a href="#hexo-常用命令" class="headerlink" title="hexo 常用命令"></a>hexo 常用命令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hexo clean：清除缓存文件和已生成的静态文件</span><br><span class="line">hexo g：生成静态文件</span><br><span class="line">hexo s：启动服务器。默认情况下，访问网址为： http://localhost:4000/</span><br><span class="line">hexo d：部署网站</span><br><span class="line">hexo v：显示 Hexo 版本</span><br></pre></td></tr></table></figure>
+
+<h3 id="写作"><a href="#写作" class="headerlink" title="写作"></a>写作</h3><p><a href="https://hexo.io/zh-cn/docs/writing" target="_blank" rel="noopener">官方文档</a></p>
+<p>你可以执行下列命令来创建一篇新文章或者新的页面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure>
+
+<p>您可以在命令中指定文章的布局（layout），默认为 <code>post</code>，可以通过修改 <code>_config.yml</code> 中的 <code>default_layout</code> 参数来指定默认布局。</p>
+<p><strong>Layout</strong></p>
+<p>Hexo 有三种默认布局：<code>post</code>、<code>page</code> 和 <code>draft</code>。在创建者三种不同类型的文件时，它们将会被保存到不同的路径；而您自定义的其他布局和 <code>post</code> 相同，都将储存到 <code>source/_posts</code> 文件夹。</p>
+<h4 id="草稿"><a href="#草稿" class="headerlink" title="草稿"></a>草稿</h4><p>刚刚提到了 Hexo 的一种特殊布局：<code>draft</code>，这种布局在建立时会被保存到 <code>source/_drafts</code> 文件夹，您可通过 <code>publish</code> 命令将草稿移动到 <code>source/_posts</code> 文件夹，该命令的使用方式与 <code>new</code> 十分类似，您也可在命令中指定 <code>layout</code> 来指定布局。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo publish [layout] &lt;title&gt;</span><br></pre></td></tr></table></figure>
+
+<p>草稿默认不会显示在页面中，您可在执行时加上 <code>--draft</code> 参数，或是把 <code>render_drafts</code> 参数设为 <code>true</code> 来预览草稿。</p>
 
     </div>
 
@@ -517,7 +543,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo-安装"><span class="nav-number">2.</span> <span class="nav-text">Hexo 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#next-主题配置"><span class="nav-number">3.</span> <span class="nav-text">next 主题配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github-Pages部署"><span class="nav-number">4.</span> <span class="nav-text">github Pages部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#头像配置"><span class="nav-number">5.</span> <span class="nav-text">头像配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#侧边栏配置"><span class="nav-number">6.</span> <span class="nav-text">侧边栏配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#社交栏邮箱正确配置"><span class="nav-number">6.1.</span> <span class="nav-text">社交栏邮箱正确配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#侧边栏位置"><span class="nav-number">6.2.</span> <span class="nav-text">侧边栏位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#默认展开所有目录"><span class="nav-number">6.3.</span> <span class="nav-text">默认展开所有目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索配置"><span class="nav-number">7.</span> <span class="nav-text">搜索配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#点击爱心效果"><span class="nav-number">8.</span> <span class="nav-text">点击爱心效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分类和标签"><span class="nav-number">9.</span> <span class="nav-text">分类和标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何设置read-more"><span class="nav-number">10.</span> <span class="nav-text">如何设置read more?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片引用问题"><span class="nav-number">11.</span> <span class="nav-text">图片引用问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语言问题"><span class="nav-number">12.</span> <span class="nav-text">语言问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评论功能"><span class="nav-number">13.</span> <span class="nav-text">评论功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#看板娘设置"><span class="nav-number">14.</span> <span class="nav-text">看板娘设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用其他文章"><span class="nav-number">15.</span> <span class="nav-text">引用其他文章</span></a></li></ol></div>
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo-安装"><span class="nav-number">2.</span> <span class="nav-text">Hexo 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#next-主题配置"><span class="nav-number">3.</span> <span class="nav-text">next 主题配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github-Pages部署"><span class="nav-number">4.</span> <span class="nav-text">github Pages部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#头像配置"><span class="nav-number">5.</span> <span class="nav-text">头像配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#侧边栏配置"><span class="nav-number">6.</span> <span class="nav-text">侧边栏配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#社交栏邮箱正确配置"><span class="nav-number">6.1.</span> <span class="nav-text">社交栏邮箱正确配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#侧边栏位置"><span class="nav-number">6.2.</span> <span class="nav-text">侧边栏位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#默认展开所有目录"><span class="nav-number">6.3.</span> <span class="nav-text">默认展开所有目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索配置"><span class="nav-number">7.</span> <span class="nav-text">搜索配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#点击爱心效果"><span class="nav-number">8.</span> <span class="nav-text">点击爱心效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分类和标签"><span class="nav-number">9.</span> <span class="nav-text">分类和标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何设置read-more"><span class="nav-number">10.</span> <span class="nav-text">如何设置read more?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片引用问题"><span class="nav-number">11.</span> <span class="nav-text">图片引用问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语言问题"><span class="nav-number">12.</span> <span class="nav-text">语言问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评论功能"><span class="nav-number">13.</span> <span class="nav-text">评论功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#看板娘设置"><span class="nav-number">14.</span> <span class="nav-text">看板娘设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#引用其他文章"><span class="nav-number">15.</span> <span class="nav-text">引用其他文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-常用命令"><span class="nav-number">16.</span> <span class="nav-text">hexo 常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#写作"><span class="nav-number">16.1.</span> <span class="nav-text">写作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#草稿"><span class="nav-number">16.1.1.</span> <span class="nav-text">草稿</span></a></li></ol></li></ol></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -536,7 +562,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -569,7 +595,23 @@
         
           
         
-        <span class="site-state-item-count">9</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -642,7 +684,55 @@
         
           
         
-        <span class="site-state-item-count">29</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>

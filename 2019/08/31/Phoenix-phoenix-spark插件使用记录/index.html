@@ -54,18 +54,18 @@
   };
 </script>
 
-  <meta name="description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+  <meta name="description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~ 版本问题可升级成 4.14.1-Hbase1.2解决,但是读取有问题，写入没问题，读取可以用jdbc方式  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoen">
 <meta name="keywords" content="Spark,phoenix">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Phoenix Spark Plugin 使用">
 <meta property="og:url" content="https://zhouhongfa.github.io/2019/08/31/Phoenix-phoenix-spark插件使用记录/index.html">
 <meta property="og:site_name" content="zhouhongfa&#39;s Blog">
-<meta property="og:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+<meta property="og:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~ 版本问题可升级成 4.14.1-Hbase1.2解决,但是读取有问题，写入没问题，读取可以用jdbc方式  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoen">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-31T10:48:55.048Z">
+<meta property="og:updated_time" content="2019-09-07T04:22:34.952Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Phoenix Spark Plugin 使用">
-<meta name="twitter:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoenix apache-phoenix-4.14.0-cdh5.14.2 ，连的远程phoenix   sca">
+<meta name="twitter:description" content="版本说明如果要用 phoenix 的 spark 插件，注意有些版本只支持spark 1.x ，scala也要相应地修改~  版本问题待解决，官方说2.x是没问题的~ 版本问题可升级成 4.14.1-Hbase1.2解决,但是读取有问题，写入没问题，读取可以用jdbc方式  这里我用 的版本如下    组件 版本    Spark spark-1.6.2-bin-hadoop2.6   phoen">
   <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/31/Phoenix-phoenix-spark插件使用记录/">
 
 
@@ -283,11 +283,19 @@
                 
               
 
-              <time title="创建时间：2019-08-31 13:46:15 / 修改时间：18:48:55" itemprop="dateCreated datePublished" datetime="2019-08-31T13:46:15+08:00">2019-08-31</time>
+              <time title="创建时间：2019-08-31 13:46:15" itemprop="dateCreated datePublished" datetime="2019-08-31T13:46:15+08:00">2019-08-31</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-07 12:22:34" itemprop="dateModified" datetime="2019-09-07T12:22:34+08:00">2019-09-07</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -318,6 +326,7 @@
         <h2 id="版本说明"><a href="#版本说明" class="headerlink" title="版本说明"></a>版本说明</h2><p>如果要用 phoenix 的 spark 插件，注意有些版本只支持spark <code>1.x</code> ，scala也要相应地修改~</p>
 <blockquote>
 <p>版本问题待解决，官方说2.x是没问题的~</p>
+<p>版本问题可升级成 4.14.1-Hbase1.2解决,但是读取有问题，写入没问题，读取可以用jdbc方式</p>
 </blockquote>
 <p>这里我用 的版本如下</p>
 <table>
@@ -385,7 +394,8 @@
 <h2 id="写入-Phoenix表"><a href="#写入-Phoenix表" class="headerlink" title="写入 Phoenix表"></a>写入 Phoenix表</h2><p>创建以下 <code>Phoenix</code> 表进行测试</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> OUTPUT_TEST_TABLE (<span class="keyword">id</span> <span class="built_in">BIGINT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> PRIMARY <span class="keyword">KEY</span>, col1 <span class="built_in">VARCHAR</span>, col2 <span class="built_in">INTEGER</span>);</span><br></pre></td></tr></table></figure>
 
-<h3 id="保存RDD"><a href="#保存RDD" class="headerlink" title="保存RDD"></a>保存RDD</h3><p>saveToPhoenix方法是RDD [Product]上的隐式方法，或者是元组的RDD。数据类型必须与Phoenix支持的某种Java类型相对应。</p>
+<h3 id="保存RDD"><a href="#保存RDD" class="headerlink" title="保存RDD"></a>保存RDD</h3><p>spark2也可以用</p>
+<p>saveToPhoenix方法是RDD [Product]上的隐式方法，或者是元组的RDD。数据类型必须与Phoenix支持的某种Java类型相对应。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.<span class="type">SparkContext</span></span><br><span class="line"><span class="keyword">import</span> org.apache.phoenix.spark._</span><br><span class="line"></span><br><span class="line"><span class="comment">// RDD写入</span></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">PhoenixRDDWriteTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="string">"local"</span>, <span class="string">"phoenix-test"</span>)</span><br><span class="line">    <span class="keyword">val</span> dataSet = <span class="type">List</span>((<span class="number">1</span>L, <span class="string">"1"</span>, <span class="number">1</span>), (<span class="number">2</span>L, <span class="string">"2"</span>, <span class="number">2</span>), (<span class="number">3</span>L, <span class="string">"3"</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">    sc</span><br><span class="line">      .parallelize(dataSet)</span><br><span class="line">      .saveToPhoenix(</span><br><span class="line">        <span class="string">"OUTPUT_TEST_TABLE"</span>,</span><br><span class="line">        <span class="type">Seq</span>(<span class="string">"ID"</span>,<span class="string">"COL1"</span>,<span class="string">"COL2"</span>),</span><br><span class="line">        zkUrl = <span class="type">Some</span>(<span class="string">"cdh01:2181"</span>)</span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>查询 <code>phoenix</code> 表</p>
@@ -524,7 +534,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -557,7 +567,23 @@
         
           
         
-        <span class="site-state-item-count">9</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">17</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -630,7 +656,55 @@
         
           
         
-        <span class="site-state-item-count">29</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">53</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
