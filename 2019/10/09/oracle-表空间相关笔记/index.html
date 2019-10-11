@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.3.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.3.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.3.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.3.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.3.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    }
+  };
+</script>
+
+  <meta name="description" content="oracle  表空间相关的笔记">
+<meta name="keywords" content="oracle,tablespace,temporary tablespace,undo tablespace">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle-表空间相关笔记">
+<meta property="og:url" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/index.html">
+<meta property="og:site_name" content="zhouhongfa&#39;s Blog">
+<meta property="og:description" content="oracle  表空间相关的笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/5.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/2.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/3.png">
+<meta property="og:image" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/4.png">
+<meta property="og:updated_time" content="2019-10-09T07:40:55.989Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="oracle-表空间相关笔记">
+<meta name="twitter:description" content="oracle  表空间相关的笔记">
+<meta name="twitter:image" content="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/5.png">
+  <link rel="canonical" href="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>oracle-表空间相关笔记 | zhouhongfa's Blog</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <link rel="stylesheet" href="/live2d/css/live2d.css" />
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhouhongfa's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">多总结</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+    
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-wrapper">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content page-post-detail">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zhouhongfa.github.io/2019/10/09/oracle-表空间相关笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhouhongfa">
+      <meta itemprop="description" content="个人博客">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhouhongfa's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">oracle-表空间相关笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-09 14:57:18 / 修改时间：15:40:55" itemprop="dateCreated datePublished" datetime="2019-10-09T14:57:18+08:00">2019-10-09</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/oracle/" itemprop="url" rel="index"><span itemprop="name">oracle</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>oracle  表空间相关的笔记</p>
+<a id="more"></a>
+
+<h2 id="官方例子"><a href="#官方例子" class="headerlink" title="官方例子"></a>官方例子</h2><blockquote>
+<p><a href="https://docs.oracle.com/html/E25494_01/omf003.htm#sthref1838" target="_blank" rel="noopener">参考https://docs.oracle.com/html/E25494_01/omf003.htm#sthref1838</a></p>
+</blockquote>
+<h3 id="Example-1"><a href="#Example-1" class="headerlink" title="Example 1"></a>Example 1</h3><p>以下示例将数据文件创建的缺省位置设置为 <code>/u01/oradata</code>，然后在该位置创建一个包含数据文件的表空间tbs_1。数据文件为100 MB，可自动扩展，最大大小不受限制。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; ALTER SYSTEM SET DB_CREATE_FILE_DEST = '/u01/oradata';</span><br><span class="line">SQL&gt; CREATE TABLESPACE tbs_1;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Example-2"><a href="#Example-2" class="headerlink" title="Example 2"></a>Example 2</h3><p>此示例在目录 <code>/ u01/oradata</code> 中创建一个名为 <code>tbs_2</code> 的表空间，其中包含数据文件。数据文件初始大小为400 MB，并且由于指定了SIZE子句，因此数据文件不可自动扩展。</p>
+<p>The following parameter setting is included in the initialization parameter file:</p>
+<p><code>DB_CREATE_FILE_DEST = &#39;/u01/oradata&#39;</code></p>
+<p>The following statement is issued at the SQL prompt:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; CREATE TABLESPACE tbs_2 DATAFILE SIZE 400M;</span><br></pre></td></tr></table></figure>
+
+<h2 id="表空间的一些笔记"><a href="#表空间的一些笔记" class="headerlink" title="表空间的一些笔记"></a>表空间的一些笔记</h2><h3 id="查询用户默认表空间"><a href="#查询用户默认表空间" class="headerlink" title="查询用户默认表空间"></a>查询用户默认表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> username,default_tablespace,TEMPORARY_TABLESPACE <span class="keyword">from</span> user_users;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查询默认表空间路径"><a href="#查询默认表空间路径" class="headerlink" title="查询默认表空间路径"></a>查询默认表空间路径</h3><p>该路径是在创建表空间时未指定 <code>datafile</code> 时默认保存的路径</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> parameter DB_CREATE_FILE_DEST</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改默认表空间路径"><a href="#修改默认表空间路径" class="headerlink" title="修改默认表空间路径"></a>修改默认表空间路径</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">SYSTEM</span> <span class="keyword">SET</span> DB_CREATE_FILE_DEST = <span class="string">'/u01/oradata'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="建表空间语句"><a href="#建表空间语句" class="headerlink" title="建表空间语句"></a>建表空间语句</h3><p><em>这里文件路径可用 ./GZ_FUYI.dbf</em></p>
+<p>这里创建一个初始大小为100m，自动扩展50m，无限制扩展的表空间 <code>gz_fuyi</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">tablespace</span> gz_fuyi <span class="keyword">datafile</span> <span class="string">'D:\oradata\orcl\yibo\gz_fuyi.dbf'</span>  <span class="keyword">size</span> <span class="number">100</span>m</span><br><span class="line"><span class="keyword">autoextend</span> <span class="keyword">on</span> <span class="keyword">next</span> <span class="number">50</span>m <span class="keyword">maxsize</span> <span class="keyword">unlimited</span></span><br><span class="line"><span class="keyword">extent</span> <span class="keyword">management</span> <span class="keyword">local</span> <span class="keyword">autoallocate</span></span><br><span class="line"><span class="keyword">segment</span> <span class="keyword">space</span> <span class="keyword">management</span> <span class="keyword">auto</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查询当前数据库默认的表空间类型"><a href="#查询当前数据库默认的表空间类型" class="headerlink" title="查询当前数据库默认的表空间类型"></a>查询当前数据库默认的表空间类型</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> database_properties <span class="keyword">where</span> property_name = <span class="string">'DEFAULT_TBS_TYPE'</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/2019/10/09/oracle-表空间相关笔记/5.png">
+
+
+<h3 id="v-datafile查当前所有表空间"><a href="#v-datafile查当前所有表空间" class="headerlink" title="v$datafile查当前所有表空间"></a>v$datafile查当前所有表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">name</span> <span class="keyword">from</span> v$<span class="keyword">datafile</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="查询当前所有表空间名及路径"><a href="#查询当前所有表空间名及路径" class="headerlink" title="查询当前所有表空间名及路径"></a>查询当前所有表空间名及路径</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> t1.name,t2.name <span class="keyword">from</span> v$<span class="keyword">tablespace</span> t1, v$<span class="keyword">datafile</span> t2 <span class="keyword">where</span> t1.ts<span class="comment"># = t2.ts#;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+<h3 id="dba-data-files查询某个表空间的信息"><a href="#dba-data-files查询某个表空间的信息" class="headerlink" title="dba_data_files查询某个表空间的信息"></a>dba_data_files查询某个表空间的信息</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> file_name,tablespace_name,online_status <span class="keyword">from</span> dba_data_files <span class="keyword">where</span> tablespace_name = <span class="string">'FUYI_ZHUANKEPINGTAI'</span>;</span><br></pre></td></tr></table></figure>
+
+<img src="/2019/10/09/oracle-表空间相关笔记/2.png">
+
+
+<h3 id="查询所有表空间容量情况"><a href="#查询所有表空间容量情况" class="headerlink" title="查询所有表空间容量情况"></a>查询所有表空间容量情况</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> Total.name <span class="string">"Tablespace Name"</span>,</span><br><span class="line">Free_space,</span><br><span class="line">(total_space - Free_space) Used_space,</span><br><span class="line">total_space</span><br><span class="line"><span class="keyword">FROM</span> (<span class="keyword">select</span> tablespace_name, <span class="keyword">sum</span>(<span class="keyword">bytes</span> / <span class="number">1024</span> / <span class="number">1024</span>) Free_Space</span><br><span class="line"><span class="keyword">from</span> sys.dba_free_space</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> tablespace_name) Free,</span><br><span class="line">(<span class="keyword">select</span> b.name, <span class="keyword">sum</span>(<span class="keyword">bytes</span> / <span class="number">1024</span> / <span class="number">1024</span>) TOTAL_SPACE</span><br><span class="line"><span class="keyword">from</span> sys.v_$<span class="keyword">datafile</span> a, sys.v_$<span class="keyword">tablespace</span> B</span><br><span class="line"><span class="keyword">where</span> a.ts<span class="comment"># = b.ts#</span></span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> b.name) Total</span><br><span class="line"><span class="keyword">WHERE</span> Free.Tablespace_name = Total.name <span class="keyword">ORDER</span> <span class="keyword">BY</span> Free.Tablespace_name;</span><br></pre></td></tr></table></figure>
+
+<img src="/2019/10/09/oracle-表空间相关笔记/3.png">
+
+
+<h3 id="修改数据库默认使用bigfile表空间"><a href="#修改数据库默认使用bigfile表空间" class="headerlink" title="修改数据库默认使用bigfile表空间"></a>修改数据库默认使用bigfile表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">set</span> <span class="keyword">default</span> <span class="keyword">bigfile</span> <span class="keyword">tablespace</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="建bigfile表空间"><a href="#建bigfile表空间" class="headerlink" title="建bigfile表空间"></a>建bigfile表空间</h3><p><em>可以将表空间默认类型改为bigfile，这样用上面的语句创建出来的就是bigfile表空间了</em></p>
+<p><a href="https://docs.oracle.com/cd/B28359_01/server.111/b28310/tspaces002.htm#ADMIN12327" target="_blank" rel="noopener">官方文档</a></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">bigfile</span> <span class="keyword">tablespace</span> bigtbs_test</span><br><span class="line"><span class="keyword">datafile</span> <span class="string">'D:\oradata\orcl\bigfile_test\bigtbs_test.dbf'</span></span><br><span class="line"><span class="keyword">size</span> <span class="number">10</span>g</span><br><span class="line"><span class="keyword">autoextend</span> <span class="keyword">on</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="建临时表空间"><a href="#建临时表空间" class="headerlink" title="建临时表空间"></a>建临时表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--temporary tablespace</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">temporary</span> <span class="keyword">tablespace</span> GZ_FUYI_TEMP tempfile <span class="string">'D:\oradata\orcl\yibo\GZ_FUYI_TEMP.dbf'</span>  </span><br><span class="line"><span class="keyword">size</span> <span class="number">100</span>m</span><br><span class="line"><span class="keyword">autoextend</span> <span class="keyword">on</span></span><br><span class="line"><span class="keyword">next</span> <span class="number">50</span>m <span class="keyword">maxsize</span> <span class="number">20</span>G</span><br><span class="line"><span class="keyword">extent</span> <span class="keyword">management</span> <span class="keyword">local</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="分配表空间给指定用户"><a href="#分配表空间给指定用户" class="headerlink" title="分配表空间给指定用户"></a>分配表空间给指定用户</h3><p><strong>给用户user_test 分配表空间TS_TEST,配额无限制</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> user_test <span class="keyword">quota</span> <span class="keyword">unlimited</span> <span class="keyword">on</span> TS_TEST;</span><br></pre></td></tr></table></figure>
+
+<h3 id="表空间修改为自动扩展"><a href="#表空间修改为自动扩展" class="headerlink" title="表空间修改为自动扩展"></a>表空间修改为自动扩展</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">tablespace</span> BIGTBS_TEST <span class="keyword">autoextend</span> <span class="keyword">on</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查询表空间信息的语句"><a href="#查询表空间信息的语句" class="headerlink" title="查询表空间信息的语句"></a>查询表空间信息的语句</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> file_name,</span><br><span class="line">       tablespace_name,</span><br><span class="line">       blocks,</span><br><span class="line">       user_bytes / <span class="number">1024</span> / <span class="number">1024</span> <span class="keyword">as</span> userful_m,</span><br><span class="line">       autoextensible</span><br><span class="line">  <span class="keyword">from</span> dba_data_files</span><br><span class="line"> <span class="keyword">where</span> tablespace_name = <span class="keyword">upper</span>(<span class="string">'bigtbs_test'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>示例</p>
+<img src="/2019/10/09/oracle-表空间相关笔记/4.png">
+
+<p>一些说明</p>
+<blockquote>
+<p>USER_BYTES is ‘Size of the useful portion of file in bytes’;<br>USER_BLOCKS is ‘Size of the useful portion of file in ORACLE blocks’;</p>
+</blockquote>
+<h3 id="修改用户默认表空间"><a href="#修改用户默认表空间" class="headerlink" title="修改用户默认表空间"></a>修改用户默认表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> yibo <span class="keyword">default</span> <span class="keyword">tablespace</span> gz_yibo_bigtbs;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>SQL&gt; alter user yibo default tablespace gz_yibo_bigtbs;<br>User altered</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> kcgl <span class="keyword">default</span> <span class="keyword">tablespace</span> kcgl <span class="keyword">temporary</span> <span class="keyword">tablespace</span> temp;</span><br><span class="line"><span class="comment">--针对某个用户的:</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> user_name <span class="keyword">default</span> <span class="keyword">tablespace</span> tbs_name;</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改用户临时表空间"><a href="#修改用户临时表空间" class="headerlink" title="修改用户临时表空间"></a>修改用户临时表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> yibo <span class="keyword">temporary</span> <span class="keyword">tablespace</span> YIBO_TEMP1;</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改数据库的默认临时表空间"><a href="#修改数据库的默认临时表空间" class="headerlink" title="修改数据库的默认临时表空间"></a>修改数据库的默认临时表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">database</span> <span class="keyword">default</span> <span class="keyword">temporary</span> <span class="keyword">tablespace</span> temp_tbs_name;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除表空间及其数据文件"><a href="#删除表空间及其数据文件" class="headerlink" title="删除表空间及其数据文件"></a>删除表空间及其数据文件</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">tablespace</span> TBS_01</span><br><span class="line"><span class="keyword">including</span> <span class="keyword">contents</span></span><br><span class="line"><span class="keyword">cascade</span> <span class="keyword">constraints</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="表空间数量超出上限解决"><a href="#表空间数量超出上限解决" class="headerlink" title="表空间数量超出上限解决"></a>表空间数量超出上限解决</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> parameter db_files;</span><br><span class="line"></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">system</span> <span class="keyword">set</span> db_files=更大的值 <span class="keyword">scope</span>=<span class="keyword">spfile</span>;</span><br><span class="line"></span><br><span class="line">shutdown immediate;</span><br><span class="line"></span><br><span class="line">startup;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改表空间最大值"><a href="#修改表空间最大值" class="headerlink" title="修改表空间最大值"></a>修改表空间最大值</h2><h2 id="UNDO表空间"><a href="#UNDO表空间" class="headerlink" title="UNDO表空间"></a>UNDO表空间</h2><h3 id="查看当前undo表空间"><a href="#查看当前undo表空间" class="headerlink" title="查看当前undo表空间"></a>查看当前undo表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> parameter undo_tablespace</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><p>语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--使用create undo tablespace</span></span><br><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">BIGFILE</span> | <span class="keyword">SMALLFILE</span>] <span class="keyword">UNDO</span> <span class="keyword">TABLESPACE</span> tbs_name</span><br><span class="line"><span class="keyword">DATAFILE</span> <span class="string">'path/filename'</span> <span class="keyword">SIZE</span> <span class="built_in">integer</span> [K | M] [<span class="keyword">REUSE</span>]</span><br><span class="line">[<span class="keyword">AUTOEXTEND</span>] [<span class="keyword">OFF</span> | <span class="keyword">ON</span>] <span class="keyword">NEXT</span> <span class="built_in">integer</span> [K | M] <span class="keyword">MAXSIZE</span> [<span class="keyword">UNLIMITED</span> | <span class="built_in">integer</span> [K | M] ]</span><br><span class="line">[<span class="keyword">EXTENT</span> <span class="keyword">MANAGEMENT</span> <span class="keyword">LOCAL</span>] [<span class="keyword">AUTOALLOCATE</span>]</span><br><span class="line">[<span class="keyword">RETENTION</span> <span class="keyword">GUARANTEE</span> | <span class="keyword">NOGUARANTEE</span>]</span><br></pre></td></tr></table></figure>
+
+<p>实例</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">bigfile</span> <span class="keyword">undo</span> <span class="keyword">tablespace</span> yibo_undo_bigtbs <span class="keyword">datafile</span> <span class="string">'D:\YIBODB\yibo_undo_bigtbs.dbf'</span> <span class="keyword">size</span> <span class="number">100</span>m  <span class="keyword">autoextend</span> <span class="keyword">on</span> <span class="keyword">next</span> <span class="number">50</span>m <span class="keyword">maxsize</span> <span class="number">50</span>g;</span><br></pre></td></tr></table></figure>
+
+<h3 id="切换undo表空间"><a href="#切换undo表空间" class="headerlink" title="切换undo表空间"></a>切换undo表空间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">SYSTEM</span> <span class="keyword">SET</span> UNDO_TABLESPACE = yibo_undo_bigtbs</span><br></pre></td></tr></table></figure>
+
+<p>不用重启实例</p>
+<h3 id="查询undo表空间"><a href="#查询undo表空间" class="headerlink" title="查询undo表空间"></a>查询undo表空间</h3><table>
+<thead>
+<tr>
+<th>数据字典</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v$undostat</td>
+<td>包含所有undo表空间的统计信息，用于对undo表空间进行监控和调整。通过该视图，可以估计当前undo表空间的大小，Oracle利用该视图完成对回退信息的自动管理，该视图数据是有最近4天内，每10分钟产生一条统计记录构成的。</td>
+</tr>
+<tr>
+<td>v$rollstat</td>
+<td>包含undo表空间中回退段的性能统计信息</td>
+</tr>
+<tr>
+<td>v$transaction</td>
+<td>包含事务所使用的回退段信息</td>
+</tr>
+<tr>
+<td>dba_undo_extents</td>
+<td>包含undo表空间中区的大小与状态信息</td>
+</tr>
+<tr>
+<td>dba_hist_undostat</td>
+<td>包含v$undostat的快照，主要是4天前的统计信息</td>
+</tr>
+</tbody></table>
+<p>查询undo表空间中回退信息的当前状态</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> tablespace_name,segment_name,extent_id,<span class="keyword">status</span> <span class="keyword">from</span> dba_undo_extents;</span><br></pre></td></tr></table></figure>
+
+<p>undo表空间中区的状态一共有3种：EXPIRED、UNEXPIRED、ACTIVE。</p>
+<p>–EXPIRED：表示该回退信息对应的事务已经提交，保存时间超过保留区；</p>
+<p>–UNEXPIRED：表示该回退信息对应的事务已经提交，保存时间没有超过保留区；</p>
+<p>–ACTIVE：表示回退信息对应的事务还没有提交，该区还在使用；</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/oracle/" rel="tag"># oracle</a>
+            
+              <a href="/tags/tablespace/" rel="tag"># tablespace</a>
+            
+              <a href="/tags/temporary-tablespace/" rel="tag"># temporary tablespace</a>
+            
+              <a href="/tags/undo-tablespace/" rel="tag"># undo tablespace</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/09/oracle-用户相关笔记/" rel="next" title="oracle-用户相关笔记">
+                  <i class="fa fa-chevron-left"></i> oracle-用户相关笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/09/linux-jdk8-安装及配置/" rel="prev" title="linux-jdk8 安装及配置">
+                  linux-jdk8 安装及配置 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#官方例子"><span class="nav-number">1.</span> <span class="nav-text">官方例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Example-1"><span class="nav-number">1.1.</span> <span class="nav-text">Example 1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Example-2"><span class="nav-number">1.2.</span> <span class="nav-text">Example 2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表空间的一些笔记"><span class="nav-number">2.</span> <span class="nav-text">表空间的一些笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查询用户默认表空间"><span class="nav-number">2.1.</span> <span class="nav-text">查询用户默认表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询默认表空间路径"><span class="nav-number">2.2.</span> <span class="nav-text">查询默认表空间路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改默认表空间路径"><span class="nav-number">2.3.</span> <span class="nav-text">修改默认表空间路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建表空间语句"><span class="nav-number">2.4.</span> <span class="nav-text">建表空间语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询当前数据库默认的表空间类型"><span class="nav-number">2.5.</span> <span class="nav-text">查询当前数据库默认的表空间类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v-datafile查当前所有表空间"><span class="nav-number">2.6.</span> <span class="nav-text">v$datafile查当前所有表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询当前所有表空间名及路径"><span class="nav-number">2.7.</span> <span class="nav-text">查询当前所有表空间名及路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dba-data-files查询某个表空间的信息"><span class="nav-number">2.8.</span> <span class="nav-text">dba_data_files查询某个表空间的信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询所有表空间容量情况"><span class="nav-number">2.9.</span> <span class="nav-text">查询所有表空间容量情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改数据库默认使用bigfile表空间"><span class="nav-number">2.10.</span> <span class="nav-text">修改数据库默认使用bigfile表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建bigfile表空间"><span class="nav-number">2.11.</span> <span class="nav-text">建bigfile表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#建临时表空间"><span class="nav-number">2.12.</span> <span class="nav-text">建临时表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分配表空间给指定用户"><span class="nav-number">2.13.</span> <span class="nav-text">分配表空间给指定用户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#表空间修改为自动扩展"><span class="nav-number">2.14.</span> <span class="nav-text">表空间修改为自动扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询表空间信息的语句"><span class="nav-number">2.15.</span> <span class="nav-text">查询表空间信息的语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改用户默认表空间"><span class="nav-number">2.16.</span> <span class="nav-text">修改用户默认表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改用户临时表空间"><span class="nav-number">2.17.</span> <span class="nav-text">修改用户临时表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改数据库的默认临时表空间"><span class="nav-number">2.18.</span> <span class="nav-text">修改数据库的默认临时表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除表空间及其数据文件"><span class="nav-number">2.19.</span> <span class="nav-text">删除表空间及其数据文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表空间数量超出上限解决"><span class="nav-number">3.</span> <span class="nav-text">表空间数量超出上限解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改表空间最大值"><span class="nav-number">4.</span> <span class="nav-text">修改表空间最大值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UNDO表空间"><span class="nav-number">5.</span> <span class="nav-text">UNDO表空间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看当前undo表空间"><span class="nav-number">5.1.</span> <span class="nav-text">查看当前undo表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建"><span class="nav-number">5.2.</span> <span class="nav-text">创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切换undo表空间"><span class="nav-number">5.3.</span> <span class="nav-text">切换undo表空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询undo表空间"><span class="nav-number">5.4.</span> <span class="nav-text">查询undo表空间</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="zhouhongfa">
+  <p class="site-author-name" itemprop="name">zhouhongfa</p>
+  <div class="site-description motion-element" itemprop="description">个人博客</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">82</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/zhouhongfa" title="GitHub &rarr; https://github.com/zhouhongfa" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:zhouhongfa1996@gmail.com" title="E-Mail &rarr; mailto:zhouhongfa1996@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhouhongfa</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.3.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  </div>
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.3.0"></script><script src="/js/motion.js?v=7.3.0"></script>
+<script src="/js/schemes/muse.js?v=7.3.0"></script>
+<script src="/js/next-boot.js?v=7.3.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.3.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4e2882f57520b8685852',
+      clientSecret: '87d0a55c793a1998fc691f20d55c56e273873c25',
+      repo: 'hexo-comment-repo',
+      owner: 'zhouhongfa',
+      admin: ['zhouhongfa'],
+      id: '95c6fa18ec792ec5279436377f45d1ff',
+        language: window.navigator.language || window.navigator.userLanguage,
+      
+      distractionFreeMode: 'true'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+  <div id="landlord">
+    <div class="message" style="opacity:0"></div>
+    <canvas id="live2d" width="280" height="250" class="live2d"></canvas>
+    <div class="hide-button">隐藏</div>
+  </div>
+</body>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+<!-- 看板娘 -->
+<script type="text/javascript">
+    var message_Path = '/live2d/'
+    var home_Path = 'https://zhouhongfa.github.io/'  //此处修改为你的域名，必须带斜杠
+</script>
+<script type="text/javascript" src="/live2d/js/live2d.js"></script>
+<script type="text/javascript" src="/live2d/js/message.js"></script>
+<script type="text/javascript">
+    loadlive2d("live2d", "/live2d/model/tia/model.json");
+</script>
+</html>

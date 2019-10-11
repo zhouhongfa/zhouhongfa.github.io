@@ -1,6 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Linux-添加用户并且给用户超级管理员权限]]></title>
+    <url>%2F2019%2F10%2F10%2FLinux-%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7%E5%B9%B6%E4%B8%94%E7%BB%99%E7%94%A8%E6%88%B7%E8%B6%85%E7%BA%A7%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90%2F</url>
+    <content type="text"><![CDATA[Linux-添加用户并且给用户超级管理员权限 添加用户1234567#adduser tommy//添加一个名为tommy的用户#passwd tommy //修改密码Changing password for user tommy.New UNIX password: //在这里输入新密码Retype new UNIX password: //再次输入新密码passwd: all authentication tokens updated successfully. 赋予root权限修改 /etc/sudoers 文件 提示只读的话用 sudo visudo 命令 参考资源Linux 添加用户 并且给用户超级管理员权限 设置su和sudo为不需要密码]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>useradd</tag>
+        <tag>visudo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Manjaro-Manjaro使用笔记]]></title>
+    <url>%2F2019%2F10%2F10%2FManjaro-Manjaro%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录 Manjaro 系统使用笔记 设置sudo不需要输入密码参考Archwiki-Sudo (简体中文) 1sudo visudo 在最后增加以下内容 1Defaults:zhouhongfa !authenticate 网络配置操作说明 在右下角网络图标左击然后单击连接名可重连，右击可进行编辑信息 更新系统设置中国源1sudo pacman-mirrors --country China 更新1pacman -Syyu 安装软件1[zhouhongfa@zhouhongfa-pc ~]$ sudo pacman -S vim git 卸载软件1sudo pacman -Rns chromium 开启 ssh服务安装 1sudo pacman -S openssh 如果自带 ssh 则不需要安装 验证 1sudo systemctl status sshd 开启服务 1sudo systemctl start sshd 开机自启 1sudo systemctl enable sshd 安装中文字体12sudo pacman -S adobe-source-han-sans-cn-fontssudo pacman -S wqy-microhei wqy-zenhei 时间设置在 Manjaro Settings Manager 中有 时间和日期设置，勾选自动设置时间即可更正时间。 安装oh-my-zsh1sudo pacman -S zsh 1sh -c &quot;$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&quot; 手动切换用户的shell chsh -s /usr/bin/zsh 配置 powerline 主题1git clone git://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme 安装 12cd oh-my-zsh-powerline-theme ./install_in_omz.sh 下载字体 12345678# clonegit clone https://github.com/powerline/fonts.git --depth=1# installcd fonts./install.sh# clean-up a bitcd ..rm -rf fonts 然后将终端字体改为 “ Meslo LG M for powerLine“ 字体 ( L M S 为尺寸大小吧) 在终端模拟器 编辑-&gt;首选项-&gt;外观 更改 主题配置参考 vim powerline插件1sudo pacman -S powerline-vim 编辑 .vimrc 文件 1234let g:powerline_pycmd=&quot;py3&quot;set laststatus=2set t_Co=256syntax on jdk安装linux-jdk8 安装及配置 安装 chrome参考资料 打包，构建 123456git clone https://aur.archlinux.org/google-chrome.gitcd google-chrome/makepkg -s 安装 1sudo pacman -U google-chrome-77.0.3865.90-1-x86_64.pkg.tar.xz 输入法安装这里我装 fcitx ，配置为新世纪五笔输入法 12sudo pacman -S fcitx-im fcitx-configtool# 我装了全部,不知道有什么不同 fcitx配置12vim ~/.xinitrcvim ~/.xprofile # xfce用这个 注意 KDM、GDM、LightDM 等显示管理器的用户，向 ~/.xprofile添加以上命令。(可能是.Xprofile，根据 .Xauthority 的大小写来判断) startx 与 slim 的用户，向 ~/.xinitrc，在 exec 语句前添加以下命令 添加以下内容 123export GTK_IM_MODULE=fcitxexport QT_IM_MODULE=fcitxexport XMODIFIERS=@im=fcitx 注销生效 打开设置界面：$ fcitx-configtool Ctrl + 空格 启动fcitxCtrl + Shift切换输入法 rime配置1sudo pacman -S fcitx-rime 下载词库 链接: https://pan.baidu.com/s/1bpdarlt 密码: qiiv 解压 1unzip 新世纪五笔rime词库.zip 移动文件 12sudo mv xinshijiwubi.dict.yaml /usr/share/rime-datasudo mv xinshijiwubi.schema.yaml /usr/share/rime-data 添加方案 1vim /usr/share/rime-data/default.yaml schema_list 下面增加 1- schema: xinshijiwubi 保存文件 重新部署 然后 可在方案列表切换为 新世纪五笔 输入法切换Ctrl+Space 切换输入法 rime中 Ctrl + ` 切换方案]]></content>
+      <categories>
+        <category>Manjaro</category>
+      </categories>
+      <tags>
+        <tag>Manjaro</tag>
+        <tag>pacman</tag>
+        <tag>powerline</tag>
+        <tag>zsh</tag>
+        <tag>oh-my-zsh</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Manjaro-VmWare安装Manjaro笔记]]></title>
+    <url>%2F2019%2F10%2F09%2FManjaro-VmWare%E5%AE%89%E8%A3%85Manjaro%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[这里安装 18.1.0 Manjaro 说明这里在vmware 中安装 Manjaro 系统，尝试在 Manjaro下编程，熟练后在物理机上使用！ 下载直接 官网 下载 这里下的是 manjaro-xfce-18.1.0-stable-x86_64.iso 创建虚拟机 先镜像，下一步，下一步即可~ 配置时区 切换到 Boot xxxx xfce进入 图型化系统 界面 双击图标进行安装 这里选手动分区 卡退了一下~，重新打开即可 分区新建分区表 选中新建的分区，点击创建 这里分区如下 挂载点 文件系统 大小 标记 / ext4 51200M lvm /boot fat32 512M boot swap linuxswap 4096M swap /home ext4 剩余的 lvm 安装配置一些信息 下一步，立刻安装 网络配置使用 NAT 模式 在 vmware 查询出主机网关 在manjaro图形化中配置以下即可 操作说明 在网络图标左击然后单击连接名可重连，右击可进行编辑信息]]></content>
+      <categories>
+        <category>Manjaro</category>
+      </categories>
+      <tags>
+        <tag>Manjaro</tag>
+        <tag>VmWare</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[linux-jdk8 安装及配置]]></title>
+    <url>%2F2019%2F10%2F09%2Flinux-jdk8-%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE%2F</url>
+    <content type="text"><![CDATA[记录在linux上安装和配置 jdk8 下载 1.8压缩包 注意用 Tab 来补全文件或目录名（版本不一样的话，不要直接复制以下命令） 1234tar -zxf jdk-8u144-linux-x64.tar.gz -C /usrmkdir -p /usr/javamv /usr/jdk1.8.0_144 /usr/java/latestvim /etc/profile shift+g 移动到最后，单击 o 加上以下内容 1234export JAVA_HOME=/usr/java/latestexport JRE_HOME=/usr/java/latest/jreexport CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/libexport PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin 单击 Esc输入 :wq 保存并退出 使环境变量生效 1source /etc/profile 一键安装脚本如下 123touch jdk-install.shchmod +x jdk-install.shvim ./jdk-install.sh 1234567891011121314151617181920212223242526272829303132333435363738394041#!/bin/sh# 用于一键安装配置JDK，放到jdk安装包同级目录即可# 使用source来运行该脚本即可# source jdk-install.sh# 获取jdk路径# 如果不是参数，则用默认的路径../JDK_TAR=$1if [ -n $JDK_TAR ];then# 找出当前目录下的jdk-*.tar.gz文件 JDK_TAR=`find . -name "jdk-*.tar.gz"`fiecho $JDK_TAR# 配置文件安装路径INS_PATH_JDK="/usr/java/latest"echo "开始进行jdk安装"# 当串的长度大于0时为真(串非空)if [ -n $JAVA_HOME ]; then # JDK安装 mkdir -p /usr/java tar -zxf $JDK_TAR -C /usr/java ln -s /usr/java/jdk* /usr/java/latest # 设置环境变量 export JAVA_HOME=/usr/java/latest export JRE_HOME=/usr/java/latest/jre export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib export PATH=$PATH:$JAVA_HOME/bin:$JRE_HOME/bin # 写入到文件中 echo "export JAVA_HOME=/usr/java/latestexport JRE_HOME=/usr/java/latest/jreexport CLASSPATH=.:\$JAVA_HOME/lib/dt.jar:\$JAVA_HOME/lib/tools.jar:\$JRE_HOME/libexport PATH=\$PATH:\$JAVA_HOME/bin:\$JRE_HOME/bin" &gt;&gt; /etc/profile source /etc/profile echo "jdk安装完成"else echo "检测到已安装JDK，JAVA_HOME为 $JAVA_HOME ，跳过jdk安装"fiecho "jdk版本信息如下"echo `java -version`]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>linux</tag>
+        <tag>jdk8</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[oracle-表空间相关笔记]]></title>
+    <url>%2F2019%2F10%2F09%2Foracle-%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[oracle 表空间相关的笔记 官方例子 参考https://docs.oracle.com/html/E25494_01/omf003.htm#sthref1838 Example 1以下示例将数据文件创建的缺省位置设置为 /u01/oradata，然后在该位置创建一个包含数据文件的表空间tbs_1。数据文件为100 MB，可自动扩展，最大大小不受限制。 12SQL&gt; ALTER SYSTEM SET DB_CREATE_FILE_DEST = '/u01/oradata';SQL&gt; CREATE TABLESPACE tbs_1; Example 2此示例在目录 / u01/oradata 中创建一个名为 tbs_2 的表空间，其中包含数据文件。数据文件初始大小为400 MB，并且由于指定了SIZE子句，因此数据文件不可自动扩展。 The following parameter setting is included in the initialization parameter file: DB_CREATE_FILE_DEST = &#39;/u01/oradata&#39; The following statement is issued at the SQL prompt: 1SQL&gt; CREATE TABLESPACE tbs_2 DATAFILE SIZE 400M; 表空间的一些笔记查询用户默认表空间1select username,default_tablespace,TEMPORARY_TABLESPACE from user_users; 查询默认表空间路径该路径是在创建表空间时未指定 datafile 时默认保存的路径 1show parameter DB_CREATE_FILE_DEST 修改默认表空间路径1ALTER SYSTEM SET DB_CREATE_FILE_DEST = '/u01/oradata'; 建表空间语句这里文件路径可用 ./GZ_FUYI.dbf 这里创建一个初始大小为100m，自动扩展50m，无限制扩展的表空间 gz_fuyi 1234create tablespace gz_fuyi datafile 'D:\oradata\orcl\yibo\gz_fuyi.dbf' size 100mautoextend on next 50m maxsize unlimitedextent management local autoallocatesegment space management auto; 查询当前数据库默认的表空间类型1select * from database_properties where property_name = 'DEFAULT_TBS_TYPE'; v$datafile查当前所有表空间1select name from v$datafile 查询当前所有表空间名及路径1select t1.name,t2.name from v$tablespace t1, v$datafile t2 where t1.ts# = t2.ts#; dba_data_files查询某个表空间的信息1select file_name,tablespace_name,online_status from dba_data_files where tablespace_name = 'FUYI_ZHUANKEPINGTAI'; 查询所有表空间容量情况123456789101112SELECT Total.name "Tablespace Name",Free_space,(total_space - Free_space) Used_space,total_spaceFROM (select tablespace_name, sum(bytes / 1024 / 1024) Free_Spacefrom sys.dba_free_spacegroup by tablespace_name) Free,(select b.name, sum(bytes / 1024 / 1024) TOTAL_SPACEfrom sys.v_$datafile a, sys.v_$tablespace Bwhere a.ts# = b.ts#group by b.name) TotalWHERE Free.Tablespace_name = Total.name ORDER BY Free.Tablespace_name; 修改数据库默认使用bigfile表空间1alter database set default bigfile tablespace; 建bigfile表空间可以将表空间默认类型改为bigfile，这样用上面的语句创建出来的就是bigfile表空间了 官方文档 1234create bigfile tablespace bigtbs_testdatafile 'D:\oradata\orcl\bigfile_test\bigtbs_test.dbf'size 10gautoextend on; 建临时表空间123456--temporary tablespacecreate temporary tablespace GZ_FUYI_TEMP tempfile 'D:\oradata\orcl\yibo\GZ_FUYI_TEMP.dbf' size 100mautoextend onnext 50m maxsize 20Gextent management local; 分配表空间给指定用户给用户user_test 分配表空间TS_TEST,配额无限制 1alter user user_test quota unlimited on TS_TEST; 表空间修改为自动扩展1alter tablespace BIGTBS_TEST autoextend on; 查询表空间信息的语句1234567select file_name, tablespace_name, blocks, user_bytes / 1024 / 1024 as userful_m, autoextensible from dba_data_files where tablespace_name = upper('bigtbs_test'); 示例 一些说明 USER_BYTES is ‘Size of the useful portion of file in bytes’;USER_BLOCKS is ‘Size of the useful portion of file in ORACLE blocks’; 修改用户默认表空间1alter user yibo default tablespace gz_yibo_bigtbs; SQL&gt; alter user yibo default tablespace gz_yibo_bigtbs;User altered 123alter user kcgl default tablespace kcgl temporary tablespace temp;--针对某个用户的:alter user user_name default tablespace tbs_name; 修改用户临时表空间1alter user yibo temporary tablespace YIBO_TEMP1; 修改数据库的默认临时表空间1alter database default temporary tablespace temp_tbs_name; 删除表空间及其数据文件123drop tablespace TBS_01including contentscascade constraints; 表空间数量超出上限解决1234567show parameter db_files;alter system set db_files=更大的值 scope=spfile;shutdown immediate;startup; 修改表空间最大值UNDO表空间查看当前undo表空间1show parameter undo_tablespace 创建语法 123456--使用create undo tablespaceCREATE [BIGFILE | SMALLFILE] UNDO TABLESPACE tbs_nameDATAFILE 'path/filename' SIZE integer [K | M] [REUSE][AUTOEXTEND] [OFF | ON] NEXT integer [K | M] MAXSIZE [UNLIMITED | integer [K | M] ][EXTENT MANAGEMENT LOCAL] [AUTOALLOCATE][RETENTION GUARANTEE | NOGUARANTEE] 实例 1create bigfile undo tablespace yibo_undo_bigtbs datafile 'D:\YIBODB\yibo_undo_bigtbs.dbf' size 100m autoextend on next 50m maxsize 50g; 切换undo表空间12ALTER SYSTEM SET UNDO_TABLESPACE = yibo_undo_bigtbs 不用重启实例 查询undo表空间 数据字典 解释 v$undostat 包含所有undo表空间的统计信息，用于对undo表空间进行监控和调整。通过该视图，可以估计当前undo表空间的大小，Oracle利用该视图完成对回退信息的自动管理，该视图数据是有最近4天内，每10分钟产生一条统计记录构成的。 v$rollstat 包含undo表空间中回退段的性能统计信息 v$transaction 包含事务所使用的回退段信息 dba_undo_extents 包含undo表空间中区的大小与状态信息 dba_hist_undostat 包含v$undostat的快照，主要是4天前的统计信息 查询undo表空间中回退信息的当前状态 1select tablespace_name,segment_name,extent_id,status from dba_undo_extents; undo表空间中区的状态一共有3种：EXPIRED、UNEXPIRED、ACTIVE。 –EXPIRED：表示该回退信息对应的事务已经提交，保存时间超过保留区； –UNEXPIRED：表示该回退信息对应的事务已经提交，保存时间没有超过保留区； –ACTIVE：表示回退信息对应的事务还没有提交，该区还在使用；]]></content>
+      <categories>
+        <category>oracle</category>
+      </categories>
+      <tags>
+        <tag>oracle</tag>
+        <tag>tablespace</tag>
+        <tag>temporary tablespace</tag>
+        <tag>undo tablespace</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[oracle-用户相关笔记]]></title>
+    <url>%2F2019%2F10%2F09%2Foracle-%E7%94%A8%E6%88%B7%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录与oracle 用户相关的笔记，用户信息查询、修改、解锁、过期等。 查询所有用户1select * from all_users 1select * from dba_users; 解锁用户1SQL&gt; alter user scott account unlock; 修改密码12SQL&gt; alter user system identified by manager;User altered. 查询当前用户1234SQL&gt; select user from dual;USER------------------------------SCOTT 查看用户过期时间注意用户名为大写 12345SQL&gt; select username, account_status, EXPIRY_DATE from dba_users where username=&apos;HIOP&apos;;USERNAME ACCOUNT_STATUS EXPIRY_DATE------------------------------ -------------------------------- -----------HIOP OPEN 2020/3/15 1 用户过期解决使用 sysdba 角色进行操作 1234567SQL&gt; connect sys/secret_password as sysdba;解锁用户SQL&gt; alter user sysman account unlock ;修改原密码，改成旧的也可以SQL&gt; alter user DBUSER identified by newpa$$word; 将用户密码设置为永不过期12345678910111213SQL&gt; alter profile DEFAULT limit PASSWORD_REUSE_TIME unlimited;Profile alteredSQL&gt; alter profile DEFAULT limit PASSWORD_LIFE_TIME unlimited;Profile alteredSQL&gt; select username, account_status, EXPIRY_DATE from dba_users where username=&apos;HIOP&apos;;USERNAME ACCOUNT_STATUS EXPIRY_DATE------------------------------ -------------------------------- -----------HIOP OPEN]]></content>
+      <categories>
+        <category>oracle</category>
+      </categories>
+      <tags>
+        <tag>oracle</tag>
+        <tag>oracle用户</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[oracle-spfile笔记]]></title>
+    <url>%2F2019%2F10%2F09%2Foracle-spfile%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[该文件用于指定 oracle 实例启动参数，这里记录一下spfile的使用 导出当前配置到文件中123SQL&gt; create pfile=&apos;D:\init.ora&apos; from spfile;File created. 这样就将 当前的 spfile 导出到 D:\init.ora 文件中 查看 spfile 文件路径这个是数据库实例启动时默认使用的配置文件路径 123456789SQL&gt; show parameter pfileNAME TYPE------------------------------------ ---------------------------------VALUE------------------------------spfile stringD:\APP\ZHF\PRODUCT\11.2.0\DBHOME_1\DATABASE\SPFILEORCL.ORA 启动时指定 pfile12345678910SQL&gt; startup pfile=&apos;E:\init0220.ora&apos;ORACLE 例程已经启动。Total System Global Area 8017100800 bytesFixed Size 2181944 bytesVariable Size 2483029192 bytesDatabase Buffers 5502926848 bytesRedo Buffers 28962816 bytes数据库装载完毕。数据库已经打开。 这里指定了不好维护，建议去 spfile 文件路径 中备份原文件，然后再修改里面的信息，这样 startup 启动数据库实例时就用的新的配置]]></content>
+      <categories>
+        <category>oracle</category>
+      </categories>
+      <tags>
+        <tag>oracle</tag>
+        <tag>spfile</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[oracle-sqlplus相关笔记]]></title>
+    <url>%2F2019%2F10%2F09%2Foracle-sqlplus%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[oracle 中的 sqlplus 使用笔记 SQLPLUS登录123456789C:\Users\zhf&gt;sqlplus /nologSQL*Plus: Release 11.2.0.1.0 Production on 星期六 12月 15 15:28:00 2018Copyright (c) 1982, 2010, Oracle. All rights reserved.SQL&gt; conn /as sysdba已连接。SQL&gt; 其他用户 1conn scott/tiger@orcl 查询当前使用的数据库12345678910111213SQL&gt; conn sys/yb123123@gzfy as sysdba已连接。SQL&gt; select name from v$database;NAME---------GZFYSQL&gt; select instance from v$thread;INSTANCE--------------------------------------------------------------------------------gzfy 切换数据库123SQL&gt; connect system@orcl输入口令:已连接。 使用dba角色登录 123SQL&gt; conn sys/yb123123@gzfy as sysdba已连接。SQL&gt; 连远程数据库第一种 直接用ip 12sqlplus /nologconn sys/yibo123@10.54.2.194/orcl as sysdba 第二种 用 tnsname 需先在 tnsname.ora文件中配置 12345678yibo130 = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl) ) ) 重启监听服务 12SQL&gt; conn yibo_test/yibo123@yibo130Connected. 显示时间12345SQL&gt; set time on22:22:19 SQL&gt; 22:29:50 SQL&gt; set time offSQL&gt; 记录执行时间12345622:29:27 SQL&gt; set timing on22:29:37 SQL&gt; select count(*) from tb_cis_patient_info;count(*)---------- 2324938Executed in 0.323 seconds 1SQL&gt; set timing off 数据库启动与关闭123456789101112131415SQL&gt; shutdown immediate数据库已经关闭。已经卸载数据库。ORACLE 例程已经关闭。SQL&gt; startupORACLE 例程已经启动。Total System Global Area 1.2827E+10 bytesFixed Size 2187728 bytesVariable Size 3456110128 bytesDatabase Buffers 9361686528 bytesRedo Buffers 7385088 bytes数据库装载完毕。数据库已经打开。]]></content>
+      <categories>
+        <category>oracle</category>
+      </categories>
+      <tags>
+        <tag>oracle</tag>
+        <tag>sqlplus</tag>
+        <tag>tnsname.ora</tag>
+        <tag>startup</tag>
+        <tag>shutdown</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[oracle-解决ORA-12514 监听程序当前无法识别连接描述符中请求的服务]]></title>
+    <url>%2F2019%2F10%2F09%2Foracle-%E8%A7%A3%E5%86%B3ORA-12514-%E7%9B%91%E5%90%AC%E7%A8%8B%E5%BA%8F%E5%BD%93%E5%89%8D%E6%97%A0%E6%B3%95%E8%AF%86%E5%88%AB%E8%BF%9E%E6%8E%A5%E6%8F%8F%E8%BF%B0%E7%AC%A6%E4%B8%AD%E8%AF%B7%E6%B1%82%E7%9A%84%E6%9C%8D%E5%8A%A1%2F</url>
+    <content type="text"><![CDATA[解决 oracle 中 tns listener报错问题记录 listener.ora 文件修改 listener.ora 文件 该文件在oracle安装目录下，示例C:\app\Administrator\product\11.2.0\dbhome_1\NETWORK\ADMIN\listener.ora 这里主要在 SID_LIST_LISTENER 增加 一个 SID_DESC 示例，增加 gzfy sid 服务 12345(SID_DESC = (GLOBAL_DBNAME = GZFY) (ORACLE_HOME = C:\app\Administrator\product\11.2.0\dbhome_1) (SID_NAME = GZFY)) 完整文件示例 12345678910111213141516171819202122232425262728293031# listener.ora Network Configuration File: C:\app\Administrator\product\11.2.0\dbhome_1\network\admin\listener.ora# Generated by Oracle configuration tools.SID_LIST_LISTENER = (SID_LIST = (SID_DESC = (SID_NAME = CLRExtProc) (ORACLE_HOME = C:\app\Administrator\product\11.2.0\dbhome_1) (PROGRAM = extproc) (ENVS = &quot;EXTPROC_DLLS=ONLY:C:\app\Administrator\product\11.2.0\dbhome_1\bin\oraclr11.dll&quot;) ) (SID_DESC = (GLOBAL_DBNAME = ORCL) (ORACLE_HOME = C:\app\Administrator\product\11.2.0\dbhome_1) (SID_NAME = ORCL) ) (SID_DESC = (GLOBAL_DBNAME = GZFY) (ORACLE_HOME = C:\app\Administrator\product\11.2.0\dbhome_1) (SID_NAME = GZFY) ) )LISTENER = (DESCRIPTION_LIST = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = pc130)(PORT = 1521)) ) )ADR_BASE_LISTENER = C:\app\Administrator tnsname.ora对应上面配置的 sid 描述，在 tnsname.ora 文件中配置 12345678GZFY = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = pc130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = gzfy) ) ) 完整文件示例 1234567891011121314151617181920212223242526272829303132333435# tnsnames.ora Network Configuration File: C:\app\Administrator\product\11.2.0\dbhome_1\network\admin\tnsnames.ora# Generated by Oracle configuration tools.ORACLR_CONNECTION_DATA = (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521)) ) (CONNECT_DATA = (SID = CLRExtProc) (PRESENTATION = RO) ) )LISTENER_ORCL = (ADDRESS = (PROTOCOL = TCP)(HOST = pc130)(PORT = 1521))ORCL = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = pc130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl) ) )GZFY = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = pc130)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = gzfy) ) ) 重启服务重启监听服务即可解决]]></content>
+      <categories>
+        <category>oracle</category>
+      </categories>
+      <tags>
+        <tag>oracle</tag>
+        <tag>tnsname.ora</tag>
+        <tag>ora-12514</tag>
+        <tag>tns listener</tag>
+        <tag>listener.ora</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[在vps上搭建ssr服务]]></title>
     <url>%2F2019%2F10%2F09%2F%E5%9C%A8vps%E4%B8%8A%E6%90%AD%E5%BB%BAssr%E6%9C%8D%E5%8A%A1%2F</url>
     <content type="text"><![CDATA[这里是centos7为示例，介绍如何在 vps 上搭建 ssr 服务端。 服务器相关建议购买香港服务器，配置不需要高，512m 都行，腾讯云活动还是挺优惠的~(不过要新用户) 安装最新内核并开启 BBR 脚本参考资料 1wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh &amp;&amp; chmod +x bbr.sh &amp;&amp; ./bbr.sh 会重启vps 验证 1sysctl net.ipv4.tcp_congestion_control 更新系统epel-release 安装 1yum install epel-release -y 更新系统： 1yum update 安装一些软件1yum -y install wget vim SSR安装12345wget --no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocksR.shchmod +x shadowsocksR.sh./shadowsocksR.sh 2&gt;&amp;1 | tee shadowsocksR.log 按提示选择对应的 配置示例 1234567Congratulations, ShadowsocksR server install completed!Your Server IP : 47.56.170.229 Your Server Port : 18406 Your Password : teddysun.com Your Protocol : auth_sha1_v4 Your obfs : tls1.2_ticket_authYour Encryption Method: aes-256-cfb 配置SSR1[root@host ~]# vim /etc/shadowsocks.json 协议和混淆插件说明 123如不考虑原版的情况下，推荐使用的协议，只有auth_sha1_v4和auth_aes128_md5和auth_aes128_sha1和auth_chain_a，推荐使用的混淆只有plain,http_simple,http_post,tls1.2_ticket_auth不要奇怪为什么推荐plain，因为混淆不总是有效果，要看各地区的策略的，有时候不混淆让其看起来像随机数据更好 单用户示例 123456789101112131415161718&#123; "server":"0.0.0.0", "server_ipv6":"[::]", "server_port":18406, "local_address":"127.0.0.1", "password": "teddysun.com", "local_port":1080, "timeout":120, "method":"aes-256-cfb", "protocol":"auth_sha1_v4", "protocol_param":"", "obfs":"tls1.2_ticket_auth", "obfs_param":"", "redirect":"", "dns_ipv6":false, "fast_open":false, "workers":1&#125; 多用户配置示例 12345678910111213141516171819&#123; "server":"0.0.0.0", "server_ipv6":"[::]", "local_address":"127.0.0.1", "port_password": &#123; "18406": "ssr18406ssr!@#" &#125;, "local_port":1080, "timeout":120, "method":"aes-256-cfb", "protocol":"auth_sha1_v4", "protocol_param":"", "obfs":"tls1.2_ticket_auth", "obfs_param":"", "redirect":"", "dns_ipv6":false, "fast_open":false, "workers":1&#125; 使用命令12345678启动：/etc/init.d/shadowsocks start停止：/etc/init.d/shadowsocks stop重启：/etc/init.d/shadowsocks restart状态：/etc/init.d/shadowsocks status配置文件路径：/etc/shadowsocks.json日志文件路径：/var/log/shadowsocks.log代码安装目录：/usr/local/shadowsocks 卸载1./shadowsocksR.sh uninstall 参考资料https://github.com/shadowsocksr-backup/shadowsocks-rss/wiki/Server-Setuphttps://github.com/shadowsocksr-backup/shadowsocks-rss/blob/master/ssr.mdhttps://github.com/shadowsocksr-backup/shadowsocks-rss/wiki/config.json ssr客户端下载各个版本shadowsocks github 一些错误配置了多用户后重启报以下错 12345[root@zhouhongfa ~]# /etc/init.d/shadowsocks restartIPv6 not supportERROR: found an error in config.json: Expecting property name: line 7 column 1 (char 133)Stopping ShadowsocksR failedShadowsocksR (pid 26765) is already running... 解决：json格式问题~]]></content>
@@ -380,9 +501,9 @@
       </categories>
       <tags>
         <tag>Docker</tag>
+        <tag>zsh</tag>
         <tag>docker-compose</tag>
         <tag>curl</tag>
-        <tag>zsh</tag>
         <tag>compose</tag>
       </tags>
   </entry>
