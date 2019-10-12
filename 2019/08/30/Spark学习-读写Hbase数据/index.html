@@ -62,15 +62,15 @@
 <meta property="og:site_name" content="zhouhongfa&#39;s Blog">
 <meta property="og:description" content="说明主要记录 Spark中读写Hbase 的操作记录">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png">
-<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219522234.png">
-<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219403082.png">
-<meta property="og:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567148286652.png">
-<meta property="og:updated_time" content="2019-08-31T07:42:03.463Z">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219363132.png">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219522234.png">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219403082.png">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567148286652.png">
+<meta property="og:updated_time" content="2019-10-12T02:34:58.832Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark学习-读写Hbase数据">
 <meta name="twitter:description" content="说明主要记录 Spark中读写Hbase 的操作记录">
-<meta name="twitter:image" content="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png">
+<meta name="twitter:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219363132.png">
   <link rel="canonical" href="https://zhouhongfa.github.io/2019/08/30/Spark学习-读写Hbase数据/">
 
 
@@ -299,7 +299,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-08-31 15:42:03" itemprop="dateModified" datetime="2019-08-31T15:42:03+08:00">2019-08-31</time>
+                <time title="修改时间：2019-10-12 10:34:58" itemprop="dateModified" datetime="2019-10-12T10:34:58+08:00">2019-10-12</time>
               </span>
             
           
@@ -353,14 +353,11 @@
 <p><code>windows</code> 上不知咋配~（下面我将 这些 <code>jar</code>作为 <code>Libraries</code> 来引用）</p>
 <p>参考 <a href="http://dblab.xmu.edu.cn/blog/1094-2/" target="_blank" rel="noopener">博客</a> 里配才是正确的吧~</p>
 <h2 id="编写读取Hbase的应用"><a href="#编写读取Hbase的应用" class="headerlink" title="编写读取Hbase的应用"></a>编写读取Hbase的应用</h2><h3 id="程序一"><a href="#程序一" class="headerlink" title="程序一"></a>程序一</h3><h4 id="Libiaries配置"><a href="#Libiaries配置" class="headerlink" title="Libiaries配置"></a>Libiaries配置</h4><p>如下引用 <code>hbase</code> 的 jar</p>
-<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219363132.png" title="引用jar">
-
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219363132.png" alt></p>
 <p>如下引用 <code>spark</code> 的jar（这里我全引了~）</p>
-<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219522234.png" title="引用jar">
-
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219522234.png" alt></p>
 <p>记得要 <code>Add to modules</code> </p>
-<img src="/2019/08/30/Spark学习-读写Hbase数据/1567219403082.png" title="引用jar">
-
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567219403082.png" alt></p>
 <h4 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h4><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yibo.examples</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.<span class="type">HBaseConfiguration</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.mapreduce.<span class="type">TableInputFormat</span></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.hbase.util.<span class="type">Bytes</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark._</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">object</span> <span class="title">HbaseReader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//读取hbase数据</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">main</span></span>(args: <span class="type">Array</span>[<span class="type">String</span>]) &#123;</span><br><span class="line">    <span class="comment">//序列化</span></span><br><span class="line">    <span class="type">System</span>.setProperty(<span class="string">"spark.serializer"</span>, <span class="string">"org.apache.spark.serializer.KryoSerializer"</span>)</span><br><span class="line">    <span class="keyword">val</span> conf = <span class="type">HBaseConfiguration</span>.create()</span><br><span class="line">    <span class="keyword">val</span> sc = <span class="keyword">new</span> <span class="type">SparkContext</span>(<span class="keyword">new</span> <span class="type">SparkConf</span>().setMaster(<span class="string">"local"</span>).setAppName(<span class="string">"SparkOperateHBase"</span>))</span><br><span class="line">    <span class="comment">//设置查询的表名</span></span><br><span class="line">    conf.set(<span class="type">TableInputFormat</span>.<span class="type">INPUT_TABLE</span>, <span class="string">"student"</span>)</span><br><span class="line">    <span class="keyword">val</span> stuRDD = sc.newAPIHadoopRDD(conf, classOf[<span class="type">TableInputFormat</span>],</span><br><span class="line">      classOf[org.apache.hadoop.hbase.io.<span class="type">ImmutableBytesWritable</span>],</span><br><span class="line">      classOf[org.apache.hadoop.hbase.client.<span class="type">Result</span>])</span><br><span class="line">    <span class="keyword">val</span> count = stuRDD.count()</span><br><span class="line">    println(<span class="string">"Students RDD Count:"</span> + count)</span><br><span class="line">    stuRDD.cache()</span><br><span class="line">    <span class="comment">//遍历输出</span></span><br><span class="line">    stuRDD.foreach(&#123; <span class="keyword">case</span> (_, result) =&gt;</span><br><span class="line">      <span class="keyword">val</span> key = <span class="type">Bytes</span>.toString(result.getRow)</span><br><span class="line">      <span class="keyword">val</span> name = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"name"</span>.getBytes))</span><br><span class="line">      <span class="keyword">val</span> gender = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"gender"</span>.getBytes))</span><br><span class="line">      <span class="keyword">val</span> age = <span class="type">Bytes</span>.toString(result.getValue(<span class="string">"info"</span>.getBytes, <span class="string">"age"</span>.getBytes))</span><br><span class="line">      println(<span class="string">"Row key:"</span> + key + <span class="string">" Name:"</span> + name + <span class="string">" Gender:"</span> + gender + <span class="string">" Age:"</span> + age)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h4 id="运行程序"><a href="#运行程序" class="headerlink" title="运行程序"></a>运行程序</h4><p>直接启动 <code>com.yibo.examples.HbaseReader</code> 类</p>
@@ -386,8 +383,7 @@
 
 <h2 id="一些问题"><a href="#一些问题" class="headerlink" title="一些问题"></a>一些问题</h2><h3 id="提交任务-时报错"><a href="#提交任务-时报错" class="headerlink" title="提交任务 时报错"></a><strong>提交任务</strong> 时报错</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/apache/hadoop/hbase/HBaseConfiguration</span><br></pre></td></tr></table></figure>
 
-<img src="/2019/08/30/Spark学习-读写Hbase数据/1567148286652.png" title="hbase-lib">
-
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1567148286652.png" alt></p>
 <p>原因为没有配置<code>Spark</code> 中引用 <code>hbase</code> 的jar，如上图是将 <code>hbase</code>的依赖打进 <code>jar</code> 中</p>
 <hr>
 <h3 id="运行任务时出错"><a href="#运行任务时出错" class="headerlink" title="运行任务时出错"></a>运行任务时出错</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.lang.NoClassDefFoundError: com/yammer/metrics/core/Gauge</span><br></pre></td></tr></table></figure>
@@ -507,7 +503,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-count">51</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -753,7 +749,15 @@
         
           
         
-        <span class="site-state-item-count">85</span>
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">89</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
