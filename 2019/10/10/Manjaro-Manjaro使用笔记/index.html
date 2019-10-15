@@ -64,7 +64,9 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/20191010150338.png">
 <meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/1570700921706.png">
-<meta property="og:updated_time" content="2019-10-12T02:14:13.672Z">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/20191014151100.png">
+<meta property="og:image" content="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/20191014150416.png">
+<meta property="og:updated_time" content="2019-10-14T08:35:38.437Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Manjaro-Manjaro使用笔记">
 <meta name="twitter:description" content="记录 Manjaro 系统使用笔记，主要是安装完系统后的一些配置和软件安装">
@@ -297,7 +299,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-10-12 10:14:13" itemprop="dateModified" datetime="2019-10-12T10:14:13+08:00">2019-10-12</time>
+                <time title="修改时间：2019-10-14 16:35:38" itemprop="dateModified" datetime="2019-10-14T16:35:38+08:00">2019-10-14</time>
               </span>
             
           
@@ -465,6 +467,18 @@
 <h3 id="switchyomega-插件安装与使用"><a href="#switchyomega-插件安装与使用" class="headerlink" title="switchyomega 插件安装与使用"></a>switchyomega 插件安装与使用</h3><p>见 </p>
 <a href="/2019/10/11/Switchyomega插件的安装与使用/" title="Switchyomega插件的安装与使用">Switchyomega插件的安装与使用</a>
 
+<h2 id="安装AUR上的包"><a href="#安装AUR上的包" class="headerlink" title="安装AUR上的包"></a>安装AUR上的包</h2><p><a href="https://dev.to/nabbisen/installing-aur-packages-bdf" target="_blank" rel="noopener">Installing AUR packages</a></p>
+<p>大概如下</p>
+<p>在 <a href="https://aur.archlinux.org/packages/" target="_blank" rel="noopener">aur</a> 上找到要下载的包</p>
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/20191014151100.png" alt></p>
+<p>复制 git 地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://aur.archlinux.org/typora.git</span><br><span class="line">cd typora</span><br><span class="line">makepkg -si</span><br></pre></td></tr></table></figure>
+
+<p>然后就OK了~</p>
+<p>如果下载很慢，可以先下载源文件，再移到目录中</p>
+<h2 id="软件包管理开启-AUR支持"><a href="#软件包管理开启-AUR支持" class="headerlink" title="软件包管理开启 AUR支持"></a>软件包管理开启 AUR支持</h2><p>安装会失败~</p>
+<p><img src="https://zhouhongfa-blog-cos-1252897212.cos.ap-guangzhou.myqcloud.com/images/20191014150416.png" alt></p>
+
     </div>
 
     
@@ -561,7 +575,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置sudo不需要输入密码"><span class="nav-number">1.</span> <span class="nav-text">设置sudo不需要输入密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络配置"><span class="nav-number">2.</span> <span class="nav-text">网络配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新系统"><span class="nav-number">3.</span> <span class="nav-text">更新系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置中国源"><span class="nav-number">3.1.</span> <span class="nav-text">设置中国源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新"><span class="nav-number">3.2.</span> <span class="nav-text">更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装软件"><span class="nav-number">4.</span> <span class="nav-text">安装软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载软件"><span class="nav-number">5.</span> <span class="nav-text">卸载软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开启-ssh服务"><span class="nav-number">6.</span> <span class="nav-text">开启 ssh服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装中文字体"><span class="nav-number">7.</span> <span class="nav-text">安装中文字体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间设置"><span class="nav-number">8.</span> <span class="nav-text">时间设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装oh-my-zsh"><span class="nav-number">9.</span> <span class="nav-text">安装oh-my-zsh</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-powerline-主题"><span class="nav-number">9.1.</span> <span class="nav-text">配置 powerline 主题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim-powerline插件"><span class="nav-number">10.</span> <span class="nav-text">vim powerline插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-chrome"><span class="nav-number">11.</span> <span class="nav-text">安装 chrome</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#输入法安装"><span class="nav-number">12.</span> <span class="nav-text">输入法安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fcitx配置"><span class="nav-number">12.1.</span> <span class="nav-text">fcitx配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rime配置"><span class="nav-number">12.2.</span> <span class="nav-text">rime配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入法切换"><span class="nav-number">12.3.</span> <span class="nav-text">输入法切换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssr客户端安装"><span class="nav-number">13.</span> <span class="nav-text">ssr客户端安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#switchyomega-插件安装与使用"><span class="nav-number">13.1.</span> <span class="nav-text">switchyomega 插件安装与使用</span></a></li></ol></li></ol></div>
+          <div class="post-toc"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置sudo不需要输入密码"><span class="nav-number">1.</span> <span class="nav-text">设置sudo不需要输入密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络配置"><span class="nav-number">2.</span> <span class="nav-text">网络配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新系统"><span class="nav-number">3.</span> <span class="nav-text">更新系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置中国源"><span class="nav-number">3.1.</span> <span class="nav-text">设置中国源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新"><span class="nav-number">3.2.</span> <span class="nav-text">更新</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装软件"><span class="nav-number">4.</span> <span class="nav-text">安装软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卸载软件"><span class="nav-number">5.</span> <span class="nav-text">卸载软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开启-ssh服务"><span class="nav-number">6.</span> <span class="nav-text">开启 ssh服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装中文字体"><span class="nav-number">7.</span> <span class="nav-text">安装中文字体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间设置"><span class="nav-number">8.</span> <span class="nav-text">时间设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装oh-my-zsh"><span class="nav-number">9.</span> <span class="nav-text">安装oh-my-zsh</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-powerline-主题"><span class="nav-number">9.1.</span> <span class="nav-text">配置 powerline 主题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim-powerline插件"><span class="nav-number">10.</span> <span class="nav-text">vim powerline插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-chrome"><span class="nav-number">11.</span> <span class="nav-text">安装 chrome</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#输入法安装"><span class="nav-number">12.</span> <span class="nav-text">输入法安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fcitx配置"><span class="nav-number">12.1.</span> <span class="nav-text">fcitx配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rime配置"><span class="nav-number">12.2.</span> <span class="nav-text">rime配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入法切换"><span class="nav-number">12.3.</span> <span class="nav-text">输入法切换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ssr客户端安装"><span class="nav-number">13.</span> <span class="nav-text">ssr客户端安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#switchyomega-插件安装与使用"><span class="nav-number">13.1.</span> <span class="nav-text">switchyomega 插件安装与使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装AUR上的包"><span class="nav-number">14.</span> <span class="nav-text">安装AUR上的包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#软件包管理开启-AUR支持"><span class="nav-number">15.</span> <span class="nav-text">软件包管理开启 AUR支持</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -580,7 +594,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">55</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -641,7 +655,13 @@
         
           
         
-        <span class="site-state-item-count">23</span>
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span>
         </a>
       </div>
@@ -834,7 +854,21 @@
         
           
         
-        <span class="site-state-item-count">89</span>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">90</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
