@@ -1,6 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Maven-maven-assembly-plugin基础使用]]></title>
+    <url>%2F2019%2F10%2F23%2FMaven-maven-assembly-plugin%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[maven-assembly-plugin 简单的使用 新建 maven 项目这里新建一个 assembly-plugin-learn 项目 pom.xml12345678910111213141516171819202122232425262728293031323334&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt; &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt; &lt;groupId&gt;org.titvax.study&lt;/groupId&gt; &lt;artifactId&gt;assemblypluginlearn&lt;/artifactId&gt; &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt; &lt;build&gt; &lt;plugins&gt; &lt;plugin&gt; &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt; &lt;version&gt;3.1.1&lt;/version&gt; &lt;configuration&gt; &lt;finalName&gt;assemblPluginStudy&lt;/finalName&gt; &lt;descriptors&gt; &lt;descriptor&gt;package.xml&lt;/descriptor&gt; &lt;/descriptors&gt; &lt;/configuration&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;make-assembly&lt;/id&gt; &lt;phase&gt;package&lt;/phase&gt; &lt;goals&gt; &lt;goal&gt;single&lt;/goal&gt; &lt;/goals&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;/plugin&gt; &lt;/plugins&gt; &lt;/build&gt;&lt;/project&gt; package.xml123456789101112131415161718&lt;assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd"&gt; &lt;id&gt;package.xml&lt;/id&gt; &lt;formats&gt; &lt;!--指定程序集的格式。通常最好通过目标参数而不是此处指定格式。--&gt; &lt;format&gt;dir&lt;/format&gt; &lt;!--以目录格式导出--&gt; &lt;format&gt;tar.gz&lt;/format&gt;&lt;!--以tar.gz格式导出--&gt; &lt;/formats&gt; &lt;includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt; &lt;!--在最终存档中包含基本目录。--&gt; &lt;fileSets&gt; &lt;!--fileSet允许将文件组包含到程序集中。--&gt; &lt;fileSet&gt; &lt;directory&gt;target/&lt;/directory&gt;&lt;!--目录--&gt; &lt;includes&gt; &lt;include&gt;assemblypluginlearn-1.0-SNAPSHOT.jar&lt;/include&gt; &lt;!--包含的文件--&gt; &lt;/includes&gt; &lt;outputDirectory&gt;output&lt;/outputDirectory&gt; &lt;!--输出目录，默认与原目录一样，即 target--&gt; &lt;/fileSet&gt; &lt;/fileSets&gt;&lt;/assembly&gt; 打包命令 1mvn clean package 打包后的结果如下所示]]></content>
+      <categories>
+        <category>Maven</category>
+      </categories>
+      <tags>
+        <tag>Maven</tag>
+        <tag>maven-assembly-plugin</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Maven-maven-assembly-plugin的使用]]></title>
+    <url>%2F2019%2F10%2F23%2FMaven-maven-assembly-plugin%E7%9A%84%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[记录 maven maven-assembly-plugin 插件的使用 使用方法官方文档 Usage Configuration assembly 翻译为 程序集 如果要使用预定义的描述符之一，则可以配置要与 &lt;descriptorRefs&gt; / &lt;descriptorRef&gt; 参数一起使用的描述符。 如果要使用自定义程序集描述符，则可以使用 &lt;descriptors&gt; / &lt;descriptor&gt;参数配置描述符的路径。 Error reading assemblies: Descriptor with ID ‘package.xml’ not found -&gt; [Help 1] 这种错误就是在自定义描述符时用成了 descriptorRefs 请注意，对程序集插件的一次调用实际上可以从多个描述符生成程序集，从而使您能够最大程度地自定义项目所生成的二进制文件套件。 创建程序集后，它将使用assemblyId作为工件的分类器，并将创建的程序集附加到项目，以便在安装和部署阶段将其上载到资源库中。 例如，假设我们的项目产生了一个JAR。 如果要创建一个包含项目依赖项的程序集二进制文件，则可以利用程序集插件的预制描述符之一。您可以在项目的 pom.xml 中进行如下配置： 123456789101112131415161718&lt;project&gt; [...] &lt;build&gt; [...] &lt;plugins&gt; &lt;plugin&gt; &lt;!-- NOTE: We don't need a groupId specification because the group is org.apache.maven.plugins ...which is assumed by default. --&gt; &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt; &lt;version&gt;3.1.1&lt;/version&gt; &lt;configuration&gt; &lt;descriptorRefs&gt; &lt;descriptorRef&gt;jar-with-dependencies&lt;/descriptorRef&gt; &lt;/descriptorRefs&gt; &lt;/configuration&gt; [...]&lt;/project&gt; 注意，Assembly Plugin允许您一次指定多个 descriptorRefs，以在一次调用中生成多种类型的程序集。 另外，我们在 src/assembly 目录中创建了一个名为 src.xml 的自定义程序集描述符（有关更多信息，请参见 参考资料部分）。我们可以告诉Assembly插件改用它： 123456789101112131415&lt;project&gt; [...] &lt;build&gt; [...] &lt;plugins&gt; &lt;plugin&gt; &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt; &lt;version&gt;3.1.1&lt;/version&gt; &lt;configuration&gt; &lt;descriptors&gt; &lt;descriptor&gt;src/assembly/src.xml&lt;/descriptor&gt; &lt;/descriptors&gt; &lt;/configuration&gt; [...]&lt;/project&gt; 再次注意，我们可以在此处指定多个自定义程序集描述符。另外，可以在同一配置中指定 descriptors 和 descriptorRefs 混合。 Note: Many other configuration options are available for the various goals in the Assembly Plugin. For more information, see the examples section or the plugin parameter documentation. Execution: Building an Assembly 在大多数情况下，您将需要确保在常规构建过程中创建了程序集。 这样可以确保程序集存档可用于安装和部署，并且可以在项目发布期间创建它们。这由 assembly:single 处理。 要将 single 目标绑定到项目的构建生命周期，可以添加以下配置（假设您使用的是 jar-with-dependencies 预制描述符）： 12345678910111213141516171819202122232425&lt;project&gt; [...] &lt;build&gt; [...] &lt;plugins&gt; &lt;plugin&gt; &lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt; &lt;version&gt;3.1.1&lt;/version&gt; &lt;configuration&gt; &lt;descriptorRefs&gt; &lt;descriptorRef&gt;jar-with-dependencies&lt;/descriptorRef&gt; &lt;/descriptorRefs&gt; &lt;/configuration&gt; &lt;executions&gt; &lt;execution&gt; &lt;id&gt;make-assembly&lt;/id&gt; &lt;!-- this is used for inheritance merges --&gt; &lt;phase&gt;package&lt;/phase&gt; &lt;!-- bind to the packaging phase --&gt; &lt;goals&gt; &lt;goal&gt;single&lt;/goal&gt; &lt;/goals&gt; &lt;/execution&gt; &lt;/executions&gt; &lt;/plugin&gt; [...]&lt;/project&gt; 然后，要创建项目程序集，只需从默认生命周期简单执行正常的打包阶段即可： 1mvn package 该构建完成后，您应该在目标目录中看到一个文件，其名称类似于以下内容： 1target/sample-1.0-SNAPSHOT-jar-with-dependencies.jar 一些资源 For more information on writing your own assembly descriptor, read the Assembly Descriptor For more information about maven-archiver, look here. For more information on advanced maven-assembly-plugin configuration, see the examples.]]></content>
+      <categories>
+        <category>Maven</category>
+      </categories>
+      <tags>
+        <tag>Maven</tag>
+        <tag>maven-assembly-plugin</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Manjaro-安装微信]]></title>
+    <url>%2F2019%2F10%2F23%2FManjaro-%E5%AE%89%E8%A3%85%E5%BE%AE%E4%BF%A1%2F</url>
+    <content type="text"><![CDATA[记录在 Manjaro 上安装 微信 可以直接在软件管理那里搜索 wechat 安装即可~ aur下搜索 wechat 手动安装也可以 安装方法见 Manjaro-Manjaro使用笔记 这里我装过 deepin-wine-wechat 这个版本，还有其他版本的没试过~ 配置文件在 ~/.deepinwine/Deepin-WeChat 输入法无法使用找到 run.sh 脚本 1sudo vim /opt/deepinwine/apps/Deepin-WeChat/run.sh 在前面加上 123export XMODIFIERS=&quot;@im=fcitx&quot;export GTK_IM_MODULE=&quot;fcitx&quot;export QT_IM_MODULE=&quot;fcitx&quot; 我试了还是不行~ wine下的应用无法输入中文，解决办法]]></content>
+      <categories>
+        <category>Manjaro</category>
+      </categories>
+      <tags>
+        <tag>Manjaro</tag>
+        <tag>wine</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Windows-删除服务]]></title>
+    <url>%2F2019%2F10%2F21%2FWindows-%E5%88%A0%E9%99%A4%E6%9C%8D%E5%8A%A1%2F</url>
+    <content type="text"><![CDATA[1sc delete &quot;MYSQL&quot;]]></content>
+      <categories>
+        <category>Windows</category>
+      </categories>
+      <tags>
+        <tag>Windows</tag>
+        <tag>sc</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Spark-SparkSql笔记]]></title>
+    <url>%2F2019%2F10%2F21%2FSpark-SparkSql%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录spark sql 的使用 开窗函数在 spark sql 中也有这个函数~ 1234val sql = &quot;&quot;&quot; select id, id_number, min(id) over (partition by id_number) as empi from view where id_number is not null or id_number != &apos;&apos; &quot;&quot;&quot; 参考资源spark 累加历史 + 统计全部 + 行转列]]></content>
+      <categories>
+        <category>Spark</category>
+      </categories>
+      <tags>
+        <tag>Spark</tag>
+        <tag>SparkSql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Centos7-防火墙firewalld使用笔记]]></title>
+    <url>%2F2019%2F10%2F20%2FCentos7-%E9%98%B2%E7%81%AB%E5%A2%99firewalld%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录 Centos7 中的防火墙 firewalld 的使用及一些常用命令 启用 firewalld开启服务1sudo systemctl start firewalld 关闭服务1sudo systemctl stop firewalld 查看服务状态1sudo systemctl status firewalld 开机启用1sudo systemctl enable firewalld 开机禁用1sudo systemctl disable firewalld firewall-cmd查询当前状态12# sudo firewall-cmd --staterunning 关于zone查询所有 12# sudo firewall-cmd --get-zonesblock dmz drop external home internal public trusted work 要将 eth0 接口改用 work zone ，则 1sudo firewall-cmd --zone=work --change-interface=eth0 查询当前（好像没输出？） 1sudo firewall-cmd --get-active-zones 查询默认的 zone 配置 12# sudo firewall-cmd --get-default-zonepublic 查询当前防火墙配置查询放空的端口，服务等 1sudo firewall-cmd --zone=public --list-all 增加配置1sudo firewall-cmd --zone=public --add-port=7000/tcp --permanent 这里放空 7000/tcp 端口并持久化 这里 --permanent 表示持久化该配置，没有此参数重启后失效 命令执行后，需执行以下命令才会生效 1sudo firewall-cmd --reload 这里端口可以是范围，如 1sudo firewall-cmd --zone=public --add-port=7000-7100/tcp --permanent ps: 重复添加会提示以下 123# sudo firewall-cmd --zone=public --add-port=7000-7100/tcp --permanentWarning: ALREADY_ENABLED: 7000-7100:tcpsuccess 删除配置123sudo firewall-cmd --zone=public --permanent --remove-port=5555/tcpsudo firewall-cmd --zone=public --permanent --remove-port=7000-7100/tcpsudo firewall-cmd --reload 其他命令拒绝所有包：firewall-cmd --panic-on取消拒绝状态： firewall-cmd --panic-off查看是否拒绝： firewall-cmd --query-panic ssh注意事项如果你改过 ssh 端口，不是 22，在此时开了防火墙，则会导致你连不上远程服务器了这时就会出现你想连也连不上你的远程服务器了只能去控制台强制关机（如果开了开机自启，我觉得要提交工单了或者重装） 开启了 firewalld 服务在默认下是放空了 ssh 服务的，但是改了ssh端口就没用了，此时建议要先还原回22端口。 而且需要注意以下顺序 假如，应先开启 firewalld 服务 如果需要将ssh端口改为 5555，则先将5555/tcp 加到防火墙配置中去，再去修改 /etc/ssh/sshd_config 文件。]]></content>
+      <categories>
+        <category>Centos7</category>
+      </categories>
+      <tags>
+        <tag>Centos</tag>
+        <tag>Linux</tag>
+        <tag>Centos7</tag>
+        <tag>firewalld</tag>
+        <tag>firewall-cmd</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Centos-安装epel-release]]></title>
+    <url>%2F2019%2F10%2F20%2FCentos-%E5%AE%89%E8%A3%85epel-release%2F</url>
+    <content type="text"><![CDATA[1sudo yum install epel-release]]></content>
+      <categories>
+        <category>Centos</category>
+      </categories>
+      <tags>
+        <tag>Centos</tag>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Docker-docker常用命令记]]></title>
+    <url>%2F2019%2F10%2F20%2FDocker-docker%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录 docker 常用命令~ 镜像相关搜索镜像1docker search mysql 拉取镜像1docker pull mysql:5.6 构建镜像使用当前目录下的 Dockerfile 进行构建 1docker build -t friendlyhello . 查看镜像12docker image lsdocker images 删除镜像1docker rmi ba7a93aae2a8 容器相关构建并启动容器使用 spring-boot-docker-app 镜像构建名为 sample-app-8889 的容器，并将 容器 8080 映射到主机 8889 端口， 1docker run -p 8889:8080 --name sample-app-8889 spring-boot-docker-app 后台运行 1docker run -d -p 8889:8080 --name sample-app-8889 spring-boot-docker-app 启动容器1docker start container-name 进入容器1docker exec -t -i mysql /bin/bash 展示运行中的容器12docker container lsdocker ps 展示所有容器(包括未运行的)12docker container ls --alldocker ps -a 删除容器12docker container rm container-id/container-namedocker rm container-id/container-name 强制删除 123docker container rm --force container-namedocker container rm -f container-namedocker rm -f 参考文档Get Started, Part 2: Containerizing an Application]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Linux-将vim设置为shelll默认编辑器]]></title>
+    <url>%2F2019%2F10%2F20%2FLinux-%E5%B0%86vim%E8%AE%BE%E7%BD%AE%E4%B8%BAshelll%E9%BB%98%E8%AE%A4%E7%BC%96%E8%BE%91%E5%99%A8%2F</url>
+    <content type="text"><![CDATA[1vim .bashrc 增加以下内容 12export VISUAL=vimexport EDITOR=&quot;$VISUAL&quot; 注销或者使用以下命令生效 1source .bashrc]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>Vim</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Phoenix-导入sql文件]]></title>
+    <url>%2F2019%2F10%2F18%2FPhoenix-%E5%AF%BC%E5%85%A5sql%E6%96%87%E4%BB%B6%2F</url>
+    <content type="text"><![CDATA[1sqlline.py localhost &lt; file.sql]]></content>
+      <categories>
+        <category>Phoenix</category>
+      </categories>
+      <tags>
+        <tag>Phoenix</tag>
+        <tag>sqlline.py</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Linux-配置ssh免密登录]]></title>
+    <url>%2F2019%2F10%2F17%2FLinux-%E9%85%8D%E7%BD%AEssh%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%2F</url>
+    <content type="text"><![CDATA[配置 Linux ssh 的免密登录 本地12ssh-keygen -P &apos;&apos; -f ~/.ssh/id_rsacat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys 远程服务器 要将公共密钥复制到服务器，请运行以下命令。确保将“ x.x.x.x”替换为服务器的IP地址，并将SYSUSER替换为您的应用所属的系统用户的名称。 1ssh-copy-id SYSUSER@x.x.x.x 登录测试1ssh SYSUSER@x.x.x.x 指定 key 1ssh -i ~/.ssh/custom_key_name SYSUSER@x.x.x.x 指定端口 1ssh-copy-id SYSUSER@x.x.x.x -p port 其他清空 keys 1echo &apos;&apos; &gt; .ssh/authorized_keys root用户需在 ssh 中配置允许 root 登录 1sudo vim /etc/ssh/sshd_config 1PermitRootLogin yes 参考How to Use SSH Public Key Authentication]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>ssh免密登录</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Manjaro-安装nginx]]></title>
+    <url>%2F2019%2F10%2F17%2FManjaro-%E5%AE%89%E8%A3%85nginx%2F</url>
+    <content type="text"><![CDATA[nginx的安装与配置 安装1sudo pacman -S nginx-mainline 配置安装nginx后的第一步该干什么写在用户手册里了. 你可以通过编辑在/etc/nginx/下的文件来修改配置。主配置文件在/etc/nginx/nginx.conf. 更多细节和例子，你可以在 http://wiki.nginx.org/Configuration 和 官方文档找到. 下面的例子包含了最常见的使用案例.我们假定你使用的是默认文件路径(/usr/share/nginx/html). 如果你改了路径，用你自己的路径替代. 备份配置 1sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak 编辑文件 1sudo mousepad /etc/nginx/nginx.conf 新版本没有 conf.d 这个目录，这里可以手动创建 1sudo mkdir /etc/nginx/conf.d 在 配置文件中 http 下 如下配置 123http &#123; include mime.types; include conf.d/*.conf; 启动用户12#user html;user root; 启动1sudo systemctl start nginx 报错如下 12019/10/17 11:07:44 [emerg] 37340#37340: bind() to 0.0.0.0:8888 failed (98: Address already in use) 配置文件中端口应该这样配置，见 Nginx will not start (Address already in use) 1234server &#123; listen 80; listen [::]:80 ipv6only=on;&#125; 重新加载配置 1sudo nginx -s reload 关于运行用户可以使用以下命令查询运行nginx的用户 1ps -ef | grep nginx 1http 13553 7697 0 14:48 ? 00:00:00 nginx: worker process 修改目录用户 1chown -R http:http dir 遇到的错误根限问题1open() &quot;/home/zhouhongfa/dist/favicon.ico&quot; failed (13: Permission denied) 见 解决Nginx出现403 forbidden (13: Permission denied)报错的四种方法 参考资源Nginx (简体中文) 用户手册]]></content>
+      <categories>
+        <category>Manjaro</category>
+      </categories>
+      <tags>
+        <tag>Manjaro</tag>
+        <tag>Nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[JavaScript-关于js数组的笔记]]></title>
+    <url>%2F2019%2F10%2F15%2FJavaScript-%E5%85%B3%E4%BA%8Ejs%E6%95%B0%E7%BB%84%E7%9A%84%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录在 开发中遇到的一些 js 数组的笔记 map 转换数组 The map() method creates a new array with the results of calling a provided function on every element in the calling array. 1234567var array1 = [1, 4, 9, 16];// pass a function to mapconst map1 = array1.map(x =&gt; x * 2);console.log(map1);// expected output: Array [2, 8, 18, 32]]]></content>
+      <categories>
+        <category>JavaScript</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+        <tag>Array</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Zookeeper-ZkCli命令笔记]]></title>
+    <url>%2F2019%2F10%2F14%2FZookeeper-ZkCli%E5%91%BD%E4%BB%A4%E7%AC%94%E8%AE%B0%2F</url>
+    <content type="text"><![CDATA[记录一些常用的 ZkCli 命令 连接服务端1$ bin/zkCli.sh -server 127.0.0.1:2181 帮助1help 命令12[zkshell: 8] ls /[zookeeper] 创建 znode12[zkshell: 9] create /zk_test my_dataCreated /zk_test 删除 znode1234[zkshell: 16] delete /zk_test[zkshell: 17] ls /[zookeeper][zkshell: 18] 非空的使用以下 1deleteall /zk_test 参考ZooKeeper Getting Started Guide]]></content>
+      <categories>
+        <category>Zookeeper</category>
+      </categories>
+      <tags>
+        <tag>Zookeeper</tag>
+        <tag>ZkCli</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Zookeeper-Zookeeper安装与配置]]></title>
+    <url>%2F2019%2F10%2F14%2FZookeeper-Zookeeper%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE%2F</url>
+    <content type="text"><![CDATA[zookeeper安装与配置 下载最新版的下载地址 历史版本下载地址 配置解压下载的包 1sudo tar -zxf apache-zookeeper-3.5.5-bin.tar.gz -C /usr/local/share 创建软连接 1sudo ln -s /usr/local/share/apache-zookeeper-3.5.5-bin /usr/local/share/zookeeper 配置环境变量1sudo vim /etc/profile 1export ZOOKEEPER_HOME=/usr/local/share/zookeeper 1source /etc/profile zoo.cfg12cd $ZOOKEEPER_HOMEsudo vim conf/zoo.cfg 1234ticketTime=2000clientPort=2181dataDir=/usr/local/share/zookeeper/datadataLogDir=/usr/local/share/zookeeper/logs 启动 zkServer12cd $ZOOKEEPER_HOMEsudo ./bin/zkServer.sh start 测试1./bin/zkCli.sh -server 127.0.0.1:2181 一些资源Zookeeper Getting Started]]></content>
+      <categories>
+        <category>Zookeeper</category>
+      </categories>
+      <tags>
+        <tag>Zookeeper</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Manjaro-安装vscode]]></title>
+    <url>%2F2019%2F10%2F14%2FManjaro-%E5%AE%89%E8%A3%85vscode%2F</url>
+    <content type="text"><![CDATA[在 Manjaro 上安装 vscode 直接安装1sudo pacman -S code 软件包管理直接搜索 vscode snap 安装不过速度太慢了 1sudo snap install code --classic 参考资源 How to install Visual Studio Code on Arch Linux Visual Studio Code on Linux]]></content>
+      <categories>
+        <category>Manjaro</category>
+      </categories>
+      <tags>
+        <tag>Manjaro</tag>
+        <tag>vscode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Git-git远程提交后回滚]]></title>
     <url>%2F2019%2F10%2F12%2FGit-git%E8%BF%9C%E7%A8%8B%E6%8F%90%E4%BA%A4%E5%90%8E%E5%9B%9E%E6%BB%9A%2F</url>
     <content type="text"><![CDATA[提交代码到远程git仓库后，如果需要回滚，则如下操作，请谨慎操作 回滚git log 查出记录，找到要回滚的 hash 1git reset --hard [hash] 强制回退 1$ git push -f 这样会导致 [hash] 后的变化无法恢复，无必要请不要做此操作，或者先备份当前代码]]></content>
@@ -91,7 +284,7 @@
   <entry>
     <title><![CDATA[Linux-添加用户并且给用户超级管理员权限]]></title>
     <url>%2F2019%2F10%2F10%2FLinux-%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7%E5%B9%B6%E4%B8%94%E7%BB%99%E7%94%A8%E6%88%B7%E8%B6%85%E7%BA%A7%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90%2F</url>
-    <content type="text"><![CDATA[Linux-添加用户并且给用户超级管理员权限 添加用户1234567#adduser tommy//添加一个名为tommy的用户#passwd tommy //修改密码Changing password for user tommy.New UNIX password: //在这里输入新密码Retype new UNIX password: //再次输入新密码passwd: all authentication tokens updated successfully. 赋予root权限修改 /etc/sudoers 文件 提示只读的话用 sudo visudo 命令 参考资源Linux 添加用户 并且给用户超级管理员权限 设置su和sudo为不需要密码]]></content>
+    <content type="text"><![CDATA[Linux-添加用户并且给用户超级管理员权限 添加用户1234567#adduser tommy//添加一个名为tommy的用户#passwd tommy //修改密码Changing password for user tommy.New UNIX password: //在这里输入新密码Retype new UNIX password: //再次输入新密码passwd: all authentication tokens updated successfully. 赋予root权限修改 /etc/sudoers 文件 提示只读的话用 sudo visudo 命令(如果不是 sudo 组，则需要用 root 用户进行操作) 移动光标，到一行root ALL=(ALL) ALL的下一行，按a，进入append模式，输入 1your_user_name ALL=(ALL) ALL 设置 sudo 不需要密码在上面配置时增加以下 1your_user_name ALL=(ALL) NOPASSWD:ALL 参考资源Linux 添加用户 并且给用户超级管理员权限 设置su和sudo为不需要密码]]></content>
       <categories>
         <category>Linux</category>
       </categories>
@@ -104,7 +297,7 @@
   <entry>
     <title><![CDATA[Manjaro-Manjaro使用笔记]]></title>
     <url>%2F2019%2F10%2F10%2FManjaro-Manjaro%E4%BD%BF%E7%94%A8%E7%AC%94%E8%AE%B0%2F</url>
-    <content type="text"><![CDATA[记录 Manjaro 系统使用笔记，主要是安装完系统后的一些配置和软件安装 设置sudo不需要输入密码参考Archwiki-Sudo (简体中文) 1sudo visudo 在最后增加以下内容 1Defaults:zhouhongfa !authenticate 网络配置操作说明 在右下角网络图标左击然后单击连接名可重连，右击可进行编辑信息 更新系统设置中国源1sudo pacman-mirrors --country China 更新1pacman -Syyu 安装软件1[zhouhongfa@zhouhongfa-pc ~]$ sudo pacman -S vim git 卸载软件1sudo pacman -Rns chromium 开启 ssh服务安装 1sudo pacman -S openssh 如果自带 ssh 则不需要安装 验证 1sudo systemctl status sshd 开启服务 1sudo systemctl start sshd 开机自启 1sudo systemctl enable sshd 安装中文字体12sudo pacman -S adobe-source-han-sans-cn-fontssudo pacman -S wqy-microhei wqy-zenhei 时间设置在 Manjaro Settings Manager 中有 时间和日期设置，勾选自动设置时间即可更正时间。 安装oh-my-zsh1sudo pacman -S zsh 1sh -c &quot;$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&quot; 手动切换用户的shell chsh -s /usr/bin/zsh 配置 powerline 主题1git clone git://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme 安装 12cd oh-my-zsh-powerline-theme ./install_in_omz.sh 下载字体 12345678# clonegit clone https://github.com/powerline/fonts.git --depth=1# installcd fonts./install.sh# clean-up a bitcd ..rm -rf fonts 然后将终端字体改为 “ Meslo LG M for powerLine“ 字体 ( L M S 为尺寸大小吧) 在终端模拟器 编辑-&gt;首选项-&gt;外观 更改 主题配置参考 vim powerline插件1sudo pacman -S powerline-vim 编辑 .vimrc 文件 1vim ~/.vimrc 1234let g:powerline_pycmd=&quot;py3&quot;set laststatus=2set t_Co=256syntax on 使用 sudo vim 时会报错问题，使用 su - 切换到 root 用户，然后同上编辑 .vimrc 文件即可 安装 chrome参考资料 打包，构建 123456git clone https://aur.archlinux.org/google-chrome.gitcd google-chrome/makepkg -s 安装 1sudo pacman -U google-chrome-77.0.3865.90-1-x86_64.pkg.tar.xz 输入法安装这里我装 fcitx ，配置为新世纪五笔输入法 12sudo pacman -S fcitx-im fcitx-configtool# 我装了全部,不知道有什么不同 fcitx配置12vim ~/.xinitrcvim ~/.xprofile # xfce用这个 注意 KDM、GDM、LightDM 等显示管理器的用户，向 ~/.xprofile添加以上命令。(可能是.Xprofile，根据 .Xauthority 的大小写来判断) startx 与 slim 的用户，向 ~/.xinitrc，在 exec 语句前添加以下命令 添加以下内容 123export GTK_IM_MODULE=fcitxexport QT_IM_MODULE=fcitxexport XMODIFIERS=@im=fcitx 注销生效 打开设置界面：$ fcitx-configtool Ctrl + 空格 启动fcitxCtrl + Shift切换输入法 rime配置1sudo pacman -S fcitx-rime 下载词库 链接: https://pan.baidu.com/s/1bpdarlt 密码: qiiv 解压 1unzip 新世纪五笔rime词库.zip 移动文件 12sudo mv xinshijiwubi.dict.yaml /usr/share/rime-datasudo mv xinshijiwubi.schema.yaml /usr/share/rime-data 添加方案 1vim /usr/share/rime-data/default.yaml schema_list 下面增加 1- schema: xinshijiwubi 保存文件 重新部署 然后 可在方案列表切换为 新世纪五笔 输入法切换Ctrl+Space 切换输入法 rime中 Ctrl + ~ 切换方案 (~这个键) ssr客户端安装 注，这个要搭配 switchyomegy 使用吧？好像是 直连模式？ 下载脚本 12345wget https://raw.githubusercontent.com/the0demiurge/CharlesScripts/master/charles/bin/ssrsudo mv ssr /usr/local/bin/cd /usr/local/binsudo chmod a+x ssr 安装 1ssr install 帮助信息 ssr help 配置 1vim ~/.local/share/shadowsocksr/config.json 示例 12345678910111213141516171819202122232425&#123; &quot;server&quot;: &quot;&quot;, &quot;server_ipv6&quot;: &quot;::&quot;, &quot;server_port&quot;:&quot;18403&quot;, &quot;local_address&quot;: &quot;127.0.0.1&quot;, &quot;local_port&quot;: 1080, &quot;password&quot;: &quot;&quot;, &quot;method&quot;: &quot;aes-256-cfb&quot;, &quot;protocol&quot;: &quot;auth_sha1_v4&quot;, &quot;protocol_param&quot;: &quot;&quot;, &quot;obfs&quot;: &quot;tls1.2_ticket_auth&quot;, &quot;obfs_param&quot;: &quot;&quot;, &quot;speed_limit_per_con&quot;: 0, &quot;speed_limit_per_user&quot;: 0, &quot;additional_ports&quot; : &#123;&#125;, &quot;additional_ports_only&quot; : false, &quot;timeout&quot;: 120, &quot;udp_timeout&quot;: 60, &quot;dns_ipv6&quot;: false, &quot;connect_verbose_info&quot;: 0, &quot;redirect&quot;: &quot;&quot;, &quot;fast_open&quot;: false&#125; 安装一些软件 1sudo pacman -S jq 启动 1ssr start 关闭 1ssr stop switchyomega 插件安装与使用见 Switchyomega插件的安装与使用 安装AUR上的包Installing AUR packages 大概如下 在 aur 上找到要下载的包 复制 git 地址 123git clone https://aur.archlinux.org/typora.gitcd typoramakepkg -si 然后就OK了~ 如果下载很慢，可以先下载源文件，再移到目录中，再进行安装 卸载AUR中的软件查询包名 123$ udo pacman -Qs navicatlocal/navicat121_premium_cs_x64 12.1.12-1 Navicat Premium is a multi-connection database development tool. (Chinese Simplified) 卸载 1sudo pacman -R navicat121_premium_cs_x64 软件包管理开启 AUR支持安装会失败~]]></content>
+    <content type="text"><![CDATA[记录 Manjaro 系统使用笔记，主要是安装完系统后的一些配置和软件安装 设置sudo不需要输入密码参考Archwiki-Sudo (简体中文) 1sudo visudo 在最后增加以下内容 1Defaults:zhouhongfa !authenticate 网络配置操作说明 在右下角网络图标左击然后单击连接名可重连，右击可进行编辑信息 更新系统设置中国源1sudo pacman-mirrors --country China 更新1pacman -Syyu 安装软件1[zhouhongfa@zhouhongfa-pc ~]$ sudo pacman -S vim git 卸载软件1sudo pacman -Rns chromium 开启 ssh服务安装 1sudo pacman -S openssh 如果自带 ssh 则不需要安装 验证 1sudo systemctl status sshd 开启服务 1sudo systemctl start sshd 开机自启 1sudo systemctl enable sshd 安装中文字体12sudo pacman -S adobe-source-han-sans-cn-fontssudo pacman -S wqy-microhei wqy-zenhei 时间设置在 Manjaro Settings Manager 中有 时间和日期设置，勾选自动设置时间即可更正时间。 安装oh-my-zsh1sudo pacman -S zsh 1sh -c &quot;$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&quot; 手动切换用户的shell chsh -s /usr/bin/zsh 配置 powerline 主题1git clone git://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme 安装 12cd oh-my-zsh-powerline-theme ./install_in_omz.sh 下载字体 12345678# clonegit clone https://github.com/powerline/fonts.git --depth=1# installcd fonts./install.sh# clean-up a bitcd ..rm -rf fonts 然后将终端字体改为 “ Meslo LG M for powerLine“ 字体 ( L M S 为尺寸大小吧) 在终端模拟器 编辑-&gt;首选项-&gt;外观 更改 主题配置参考 vim powerline插件1sudo pacman -S powerline-vim 编辑 .vimrc 文件 1vim ~/.vimrc 1234let g:powerline_pycmd=&quot;py3&quot;set laststatus=2set t_Co=256syntax on 使用 sudo vim 时会报错问题，使用 su - 切换到 root 用户，然后同上编辑 .vimrc 文件即可 安装 chrome参考资料 打包，构建 123456git clone https://aur.archlinux.org/google-chrome.gitcd google-chrome/makepkg -s 安装 1sudo pacman -U google-chrome-77.0.3865.90-1-x86_64.pkg.tar.xz 输入法安装这里我装 fcitx ，配置为新世纪五笔输入法 12sudo pacman -S fcitx-im fcitx-configtool# 我装了全部,不知道有什么不同 fcitx配置12vim ~/.xinitrcvim ~/.xprofile # xfce用这个 注意 KDM、GDM、LightDM 等显示管理器的用户，向 ~/.xprofile添加以上命令。(可能是.Xprofile，根据 .Xauthority 的大小写来判断) startx 与 slim 的用户，向 ~/.xinitrc，在 exec 语句前添加以下命令 添加以下内容 123export GTK_IM_MODULE=fcitxexport QT_IM_MODULE=fcitxexport XMODIFIERS=@im=fcitx 注销生效 打开设置界面：$ fcitx-configtool Ctrl + 空格 启动fcitxCtrl + Shift切换输入法 rime配置1sudo pacman -S fcitx-rime 下载词库 链接: https://pan.baidu.com/s/1bpdarlt 密码: qiiv 解压 1unzip 新世纪五笔rime词库.zip 移动文件 12sudo mv xinshijiwubi.dict.yaml /usr/share/rime-datasudo mv xinshijiwubi.schema.yaml /usr/share/rime-data 添加方案 1vim /usr/share/rime-data/default.yaml schema_list 下面增加 1- schema: xinshijiwubi 保存文件 重新部署 然后 可在方案列表切换为 新世纪五笔 输入法切换Ctrl+Space 切换输入法 rime中 Ctrl + ~ 切换方案 (~这个键) ssr客户端安装 注，这个要搭配 switchyomegy 使用吧？好像是 直连模式？ 下载脚本 12345wget https://raw.githubusercontent.com/the0demiurge/CharlesScripts/master/charles/bin/ssrsudo mv ssr /usr/local/bin/cd /usr/local/binsudo chmod a+x ssr 安装 1ssr install 帮助信息 ssr help 配置 1vim ~/.local/share/shadowsocksr/config.json 示例 12345678910111213141516171819202122232425&#123; &quot;server&quot;: &quot;&quot;, &quot;server_ipv6&quot;: &quot;::&quot;, &quot;server_port&quot;:&quot;18403&quot;, &quot;local_address&quot;: &quot;127.0.0.1&quot;, &quot;local_port&quot;: 1080, &quot;password&quot;: &quot;&quot;, &quot;method&quot;: &quot;aes-256-cfb&quot;, &quot;protocol&quot;: &quot;auth_sha1_v4&quot;, &quot;protocol_param&quot;: &quot;&quot;, &quot;obfs&quot;: &quot;tls1.2_ticket_auth&quot;, &quot;obfs_param&quot;: &quot;&quot;, &quot;speed_limit_per_con&quot;: 0, &quot;speed_limit_per_user&quot;: 0, &quot;additional_ports&quot; : &#123;&#125;, &quot;additional_ports_only&quot; : false, &quot;timeout&quot;: 120, &quot;udp_timeout&quot;: 60, &quot;dns_ipv6&quot;: false, &quot;connect_verbose_info&quot;: 0, &quot;redirect&quot;: &quot;&quot;, &quot;fast_open&quot;: false&#125; 安装一些软件 1sudo pacman -S jq 启动 1ssr start 关闭 1ssr stop switchyomega 插件安装与使用见 Switchyomega插件的安装与使用 安装AUR上的包Installing AUR packages 大概如下 在 aur 上找到要下载的包 复制 git 地址 123git clone https://aur.archlinux.org/typora.gitcd typoramakepkg -si 然后就OK了~ 如果下载很慢，可以先下载源文件，再移到目录中，再进行安装 卸载AUR中的软件查询包名 123$ udo pacman -Qs navicatlocal/navicat121_premium_cs_x64 12.1.12-1 Navicat Premium is a multi-connection database development tool. (Chinese Simplified) 卸载 1sudo pacman -R navicat121_premium_cs_x64 软件包管理开启 AUR支持安装会失败~ 语言修改查看当前使用的语言 12$ env | grep LANG LANG=zh_CN.UTF-8]]></content>
       <categories>
         <category>Manjaro</category>
       </categories>
@@ -188,8 +381,8 @@
       </categories>
       <tags>
         <tag>oracle</tag>
-        <tag>tnsname.ora</tag>
         <tag>sqlplus</tag>
+        <tag>tnsname.ora</tag>
         <tag>startup</tag>
         <tag>shutdown</tag>
       </tags>
@@ -203,10 +396,10 @@
       </categories>
       <tags>
         <tag>oracle</tag>
+        <tag>tnsname.ora</tag>
         <tag>ora-12514</tag>
         <tag>tns listener</tag>
         <tag>listener.ora</tag>
-        <tag>tnsname.ora</tag>
       </tags>
   </entry>
   <entry>
@@ -460,7 +653,7 @@
   <entry>
     <title><![CDATA[Phoenix-一些笔记]]></title>
     <url>%2F2019%2F08%2F31%2FPhoenix-%E4%B8%80%E4%BA%9B%E7%AC%94%E8%AE%B0%2F</url>
-    <content type="text"><![CDATA[sqlline.py使用连接1./sqlline.py localhost 常用命令显示所有表 !tables 查看表结构 !describe 表名 退出 !quit 查看帮助 !help 建表语句1create table userinfo_c(id varchar primary key,name varchar); 与Hbase关联先到 Hbase建表 1create &apos;patient_test&apos;,&apos;info&apos; 再创建phoenix表 1create table &quot;patient_test&quot;(&quot;id&quot; varchar primary key,&quot;info&quot;.&quot;name&quot; varchar, &quot;info&quot;.&quot;id_number&quot; varchar, &quot;info&quot;.&quot;phone&quot; varchar, &quot;info&quot;.&quot;sex&quot; varchar, &quot;info&quot;.&quot;file_number&quot; varchar, &quot;info&quot;.&quot;empi&quot; varchar); 注意要用 双引号括起来所有的字段和表名，不然关联不了 在 phoenix 上插入一条数据 120: jdbc:phoenix:&gt; upsert into &quot;patient_test&quot; values( &apos;1000&apos; ,&apos;王五&apos;,&apos;1234&apos;,&apos;12345&apos;,&apos;1&apos;,&apos;0001&apos;,&apos;&apos;);1 row affected (0.097 seconds) 到 hbase上查询 12345678hbase(main):009:0&gt; scan &apos;patient_test&apos;ROW COLUMN+CELL 1000 column=info:_0, timestamp=1567564026903, value=x 1000 column=info:file_number, timestamp=1567564026903, value=0001 1000 column=info:id_number, timestamp=1567564026903, value=1234 1000 column=info:name, timestamp=1567564026903, value=\xE7\x8E\x8B\xE4\xBA\x94 1000 column=info:phone, timestamp=1567564026903, value=12345 1000 column=info:sex, timestamp=1567564026903, value=\x80\x00\x00\x00\x00\x00\x00\x01 Hbase 1put &apos;patient_test&apos;, &apos;1000&apos;,&apos;info:sex&apos;,1 bigint 类型字段会存在 hbase 插入的数据 phoneix读取不了，phoenix插入的数据 hbase读取不正常 1230: jdbc:phoenix:&gt; select * from &quot;patient_test&quot;;Error: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6 (state=22000,code=201)java.sql.SQLException: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6 所以最好所有都用 varchar 存 修改表字段12345ALTER TABLE my_schema.my_table ADD d.dept_id char(10) VERSIONS=10ALTER TABLE my_table ADD dept_name char(50), parent_id char(15) null primary keyALTER TABLE my_table DROP COLUMN d.dept_id, parent_id;ALTER VIEW my_view DROP COLUMN new_col;ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true; 12ALTER TABLE "gzhonghui"."patient_basic_information" ADD "empi" varchar;ALTER TABLE "gzhonghui"."patient_basic_information" DROP "empi";]]></content>
+    <content type="text"><![CDATA[sqlline.py使用连接1./sqlline.py localhost 常用命令显示所有表 !tables 查看表结构 !describe 表名 退出 !quit 查看帮助 !help 建表语句1create table userinfo_c(id varchar primary key,name varchar); 与Hbase关联先到 Hbase建表 1create &apos;patient_test&apos;,&apos;info&apos; 再创建phoenix表 1create table &quot;patient_test&quot;(&quot;id&quot; varchar primary key,&quot;info&quot;.&quot;name&quot; varchar, &quot;info&quot;.&quot;id_number&quot; varchar, &quot;info&quot;.&quot;phone&quot; varchar, &quot;info&quot;.&quot;sex&quot; varchar, &quot;info&quot;.&quot;file_number&quot; varchar, &quot;info&quot;.&quot;empi&quot; varchar); 注意要用 双引号括起来所有的字段和表名，不然关联不了 在 phoenix 上插入一条数据 120: jdbc:phoenix:&gt; upsert into &quot;patient_test&quot; values( &apos;1000&apos; ,&apos;王五&apos;,&apos;1234&apos;,&apos;12345&apos;,&apos;1&apos;,&apos;0001&apos;,&apos;&apos;);1 row affected (0.097 seconds) 到 hbase上查询 12345678hbase(main):009:0&gt; scan &apos;patient_test&apos;ROW COLUMN+CELL 1000 column=info:_0, timestamp=1567564026903, value=x 1000 column=info:file_number, timestamp=1567564026903, value=0001 1000 column=info:id_number, timestamp=1567564026903, value=1234 1000 column=info:name, timestamp=1567564026903, value=\xE7\x8E\x8B\xE4\xBA\x94 1000 column=info:phone, timestamp=1567564026903, value=12345 1000 column=info:sex, timestamp=1567564026903, value=\x80\x00\x00\x00\x00\x00\x00\x01 Hbase 1put &apos;patient_test&apos;, &apos;1000&apos;,&apos;info:sex&apos;,1 bigint 类型字段会存在 hbase 插入的数据 phoneix读取不了，phoenix插入的数据 hbase读取不正常 1230: jdbc:phoenix:&gt; select * from &quot;patient_test&quot;;Error: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6 (state=22000,code=201)java.sql.SQLException: ERROR 201 (22000): Illegal data. Expected length of at least 8 bytes, but had 6 所以最好所有都用 varchar 存 修改表字段先删除原表字段再使用新的类型添加回去 12345ALTER TABLE my_schema.my_table ADD d.dept_id char(10) VERSIONS=10ALTER TABLE my_table ADD dept_name char(50), parent_id char(15) null primary keyALTER TABLE my_table DROP COLUMN d.dept_id, parent_id;ALTER VIEW my_view DROP COLUMN new_col;ALTER TABLE my_table SET IMMUTABLE_ROWS=true,DISABLE_WAL=true; 12ALTER TABLE my_schema.my_table DROP COLUMN col;ALTER TABLE my_schema.my_table ADD col varchar;]]></content>
       <categories>
         <category>test</category>
       </categories>
@@ -607,8 +800,8 @@
         <category>Docker</category>
       </categories>
       <tags>
-        <tag>nginx</tag>
         <tag>Docker</tag>
+        <tag>nginx</tag>
       </tags>
   </entry>
   <entry>
@@ -631,11 +824,11 @@
         <category>大数据</category>
       </categories>
       <tags>
-        <tag>大数据</tag>
-        <tag>windows</tag>
         <tag>hadoop</tag>
+        <tag>大数据</tag>
         <tag>yarn</tag>
         <tag>hdfs</tag>
+        <tag>windows</tag>
       </tags>
   </entry>
   <entry>
